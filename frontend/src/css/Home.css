@@ -1,0 +1,85 @@
+/* Home.css */
+.home-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    font-family: 'Arial', sans-serif;
+    background-color: #f0f2f5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.home-title {
+    color: #1877f2;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.home-welcome {
+    font-size: 1.2rem;
+    color: #65676b;
+    margin-bottom: 2rem;
+}
+
+.button-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.home-button {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: #e7f3ff;
+    color: #1877f2;
+}
+
+.home-button:hover {
+    background-color: #d0e8ff;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.logout-container {
+    margin-top: auto;
+    padding-top: 2rem;
+}
+
+.home-button.logout {
+    background-color: #1877f2;
+    color: white;
+}
+
+.home-button.logout:hover {
+    background-color: #166fe5;
+}
+
+@media (max-width: 600px) {
+    .home-container {
+        padding: 1rem;
+    }
+
+    .home-title {
+        font-size: 2rem;
+    }
+
+    .home-welcome {
+        font-size: 1rem;
+    }
+
+    .home-button {
+        width: 100%;
+    }
+
+    .button-container {
+        flex-direction: column;
+    }
+}

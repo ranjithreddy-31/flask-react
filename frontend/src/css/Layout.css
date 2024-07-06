@@ -1,0 +1,67 @@
+/* Layout.css */
+.layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    font-family: 'Arial', sans-serif;
+    background-color: #f0f2f5;
+  }
+  
+  .navbar {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .nav-button {
+    padding: 0.5rem 1rem;
+    margin-left: 1rem;
+    border: none;
+    border-radius: 20px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .nav-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  
+  .nav-button:not(.logout) {
+    background-color: #e7f3ff;
+    color: #1877f2;
+  }
+  
+  .nav-button:not(.logout):hover {
+    background-color: #d0e8ff;
+  }
+  
+  .logout {
+    background-color: #1877f2;
+    color: white;
+  }
+  
+  .logout:hover {
+    background-color: #166fe5;
+  }
+  
+  .main-content {
+    flex-grow: 1;
+    padding: 2rem;
+  }
+  
+  /* Add responsiveness */
+  @media (max-width: 768px) {
+    .navbar {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  
+    .nav-button {
+      margin: 0.5rem 0;
+    }
+  }

@@ -1,0 +1,101 @@
+/* Weather.css */
+
+.weather-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: var(--background-color);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.weather-form {
+    margin-bottom: 20px;
+}
+
+.weather-data {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.city-name {
+    font-size: 24px;
+    color: var(--text-color-primary);
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.weather-main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.weather-icon {
+    width: 80px;
+    height: 80px;
+    margin-right: 15px;
+}
+
+.temperature {
+    font-size: 36px;
+    font-weight: bold;
+    color: var(--text-color-primary);
+}
+
+.weather-description {
+    font-size: 18px;
+    color: var(--text-color-secondary);
+    text-transform: capitalize;
+}
+
+.weather-details {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    color: var(--text-color-primary);
+}
+
+.detail-label {
+    font-weight: bold;
+}
+
+.sun-times {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.sun-item {
+    text-align: center;
+    color: var(--text-color-primary);
+}
+
+.sun-label {
+    font-weight: bold;
+}
+
+.local-time, .coordinates {
+    text-align: center;
+    color: var(--text-color-secondary);
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.loading, .error {
+    text-align: center;
+    font-weight: bold;
+}
+
+.error {
+    color: var(--danger-color);
+}
