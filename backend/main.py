@@ -1,8 +1,8 @@
 from flask import Flask, jsonify, request
-from flask_jwt_extended import JWTManager, create_access_token, get_jwt, jwt_required, unset_jwt_cookies
+from flask_jwt_extended import JWTManager, create_access_token, get_jwt, jwt_required, unset_jwt_cookies, get_jwt_identity
 from flask_bcrypt import Bcrypt
 from sqlalchemy import text
-from models import User, TodoItems, db
+from models import User, TodoItem, Feed, db
 from flask_cors import CORS
 import requests
 import json
@@ -247,7 +247,7 @@ def get_data_from_url():
 @app.route("/getAllItems", methods=['GET'])
 @jwt_required()
 def get_all_items():
-    all_items = TodoItems.query.all()
+    all_items = TodoItem.query.all()
     all_items_list = [{'id': i.id, 'task': i.task, 'completed': i.completed, 'created_at': i.created_at} for i in all_items]
     return jsonify({'message': 'Successfully retrieved items', 'items': all_items_list}), 200
 
@@ -261,10 +261,10 @@ def add_todo_item():
         tuple: JSON response and HTTP status code.
     """
     data = request.get_json()
-    item = TodoItems(task=data['item'], completed=False)  # Create a new TodoItems instance
+    item = TodoItem(task=data['item'], completed=False)
     db.session.add(item)
     db.session.commit()
-    item = TodoItems.query.filter_by(task=data['item']).first()
+    item = TodoItem.query.filter_by(task=data['item']).first()
     return jsonify({'message': 'Successfully added the item', 'item': {'id': item.id, 'task': item.task, 'completed': item.completed, 'created_at': item.created_at}}), 201
     
 @app.route("/clearTodoList", methods=['DELETE'])
@@ -277,7 +277,7 @@ def clear_todo_list():
         tuple: JSON response and HTTP status code.
     """
     try:
-        db.session.query(TodoItems).delete()
+        db.session.query(TodoItem).delete()
         db.session.commit()
         return jsonify({'message': 'Successfully cleared the Todo List'}), 200
     except Exception as e:
@@ -293,13 +293,13 @@ def update_todo_item():
         tuple: JSON response and HTTP status code.
     """
     data = request.get_json()
-    item = TodoItems.query.filter_by(id=data['item_id']).first()
+    item = TodoItem.query.filter_by(id=data['item_id']).first()
     if item is None:
         return jsonify({"error": "Item not found"}), 404
     try:
         item.completed = not item.completed
         db.session.commit()
-        item = TodoItems.query.filter_by(id=data['item_id']).first()
+        item = TodoItem.query.filter_by(id=data['item_id']).first()
         return jsonify({'message': 'Successfully updated the item', 'item': {'id': item.id, 'task': item.task, 'completed': item.completed, 'created_at': item.created_at}}), 200
     except Exception as e:
         return jsonify({'message': f'Failed to update the item with error {e}'}), 400
@@ -383,6 +383,28 @@ def getWeather():
     except Exception as e:
         return jsonify({'message': f'Failed to fetch weather information: {e}'}), 400
 
+@app.route("/addFeed", methods=["POST"])
+@jwt_required()
+def addFeed():
+    data = request.get_json()
+    heading = data['heading']
+    content = data['content']
+    user_id  = get_jwt_identity() 
+    try:
+        new_feed = Feed(heading=heading, content=content, created_by=user_id)
+        db.session.add(new_feed)
+        db.session.commit()
+
+        return jsonify({'message': 'Feed added successfully', 'feed_id': new_feed.id}), 201
+    except:
+        return jsonify({'message': 'Failed to add the feed'}), 401
+    
+@app.route("/getAllFeeds", methods=["GET"])
+@jwt_required()
+def getAllFeeds():
+    all_feeds = Feed.query.all()
+    all_feeds_list = [{'id': i.id, 'heading': i.heading, 'content': i.content, 'created_by': i.created_by, 'created_at': i.created_at} for i in all_feeds]
+    return jsonify({'message': 'Successfully retrieved Feeds', 'feeds': all_feeds_list}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)

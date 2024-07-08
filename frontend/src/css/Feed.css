@@ -1,0 +1,32 @@
+/* Feed.css */
+.feed-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.posts-list {
+    margin-bottom: 20px;
+}
+
+.post-item {
+    background-color: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.post-heading {
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+.post-content {
+    margin-bottom: 10px;
+}
+
+.post-meta {
+    font-size: 0.9em;
+    color: var(--text-color-secondary);
+}

@@ -8,6 +8,7 @@ import ScrapeData from './components/ScrapeData';
 import TodoList from './components/TodoList';
 import Calculator from './components/Calculator';
 import Weather from './components/Weather';
+import Feed from './components/Feed';
 
 const App = () => {
   return (
@@ -21,6 +22,7 @@ const App = () => {
         <Route path="/todo_list" element={<PrivateRoute><TodoList /></PrivateRoute>} />
         <Route path="/calculator" element={<PrivateRoute><Calculator /></PrivateRoute>} />
         <Route path="/weather" element={<PrivateRoute><Weather /></PrivateRoute>} />
+        <Route path="/feed" element={<PrivateRoute><Feed/></PrivateRoute>} />
       </Routes>
     </Router>
   );
