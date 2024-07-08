@@ -402,8 +402,14 @@ def addFeed():
 @app.route("/getAllFeeds", methods=["GET"])
 @jwt_required()
 def getAllFeeds():
-    all_feeds = Feed.query.all()
-    all_feeds_list = [{'id': i.id, 'heading': i.heading, 'content': i.content, 'created_by': i.created_by, 'created_at': i.created_at} for i in all_feeds]
+    all_feeds = Feed.query.join(User).all()
+    all_feeds_list = [{
+        'id': i.id, 
+        'heading': i.heading, 
+        'content': i.content, 
+        'created_by': i.creator.username,  # Use the username from the related User
+        'created_at': i.created_at
+    } for i in all_feeds]
     return jsonify({'message': 'Successfully retrieved Feeds', 'feeds': all_feeds_list}), 200
 
 if __name__ == '__main__':

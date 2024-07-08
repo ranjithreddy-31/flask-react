@@ -10,7 +10,6 @@ function AddFeed({onFeedAdded}) {
     const [content, setContent] = useState('');
     const [message, setMessage] = useState('Shoot your Post!!')
     const addFeed = async(event) =>{
-        event.preventDefault();
         try{
             const token = localStorage.getItem('token');
             if(isTokenExpired(token)){
@@ -24,6 +23,8 @@ function AddFeed({onFeedAdded}) {
                     Authorization: `Bearer ${token}`
                 }
             });
+            setHeading('');
+            setContent('');
             setMessage('Successfully added you post, make another one?');
             onFeedAdded();
         } catch (error) {
