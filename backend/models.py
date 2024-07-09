@@ -10,6 +10,7 @@ class User(db.Model):
     password = db.Column(db.String(60), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     feeds = db.relationship('Feed', backref='creator', lazy=True)
+    comments = db.relationship('Comment', backref='author', lazy=True)
 
 class TodoItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -23,3 +24,11 @@ class Feed(db.Model):
     content = db.Column(db.String(300), nullable=False)
     created_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    comments = db.relationship('Comment', backref='post', lazy=True)
+
+class Comment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    feed_id = db.Column(db.Integer, db.ForeignKey('feed.id'), nullable=False)
+    comment = db.Column(db.String(300), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    added_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)

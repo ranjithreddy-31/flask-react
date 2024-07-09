@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request
 from flask_jwt_extended import JWTManager, create_access_token, get_jwt, jwt_required, unset_jwt_cookies, get_jwt_identity
 from flask_bcrypt import Bcrypt
 from sqlalchemy import text
-from models import User, TodoItem, Feed, db
+from models import User, TodoItem, Feed, Comment, db
 from flask_cors import CORS
 import requests
 import json
@@ -403,14 +403,44 @@ def addFeed():
 @jwt_required()
 def getAllFeeds():
     all_feeds = Feed.query.join(User).all()
-    all_feeds_list = [{
-        'id': i.id, 
-        'heading': i.heading, 
-        'content': i.content, 
-        'created_by': i.creator.username,  # Use the username from the related User
-        'created_at': i.created_at
-    } for i in all_feeds]
+    all_feeds_list = []
+    
+    for feed in all_feeds:
+        comments = Comment.query.filter_by(feed_id=feed.id).join(User).all()
+        comment_list = [{
+            'id': comment.id,
+            'comment': comment.comment,
+            'added_by': comment.author.username,
+            'added_at': comment.added_at
+        } for comment in comments]
+        
+        feed_data = {
+            'id': feed.id, 
+            'heading': feed.heading, 
+            'content': feed.content, 
+            'created_by': feed.creator.username,
+            'created_at': feed.created_at,
+            'comments': comment_list
+        }
+        all_feeds_list.append(feed_data)
     return jsonify({'message': 'Successfully retrieved Feeds', 'feeds': all_feeds_list}), 200
+
+@app.route("/addComment", methods=["POST"])
+@jwt_required()
+def addComment():
+    data = request.get_json()
+    feed_id = data['feed_id']
+    comment = data['comment']
+    user_id = get_jwt_identity() 
+    try:
+        new_comment = Comment(feed_id=feed_id, comment=comment, user_id=user_id)
+        db.session.add(new_comment)
+        db.session.commit()
+
+        return jsonify({'message': 'Comment added successfully', 'comment_id': new_comment.id}), 201
+    except Exception as e:
+        db.session.rollback() 
+        return jsonify({'message': f'Failed to add the Comment:{e}'}), 401
 
 if __name__ == '__main__':
     app.run(debug=True)
