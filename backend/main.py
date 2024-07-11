@@ -453,5 +453,34 @@ def addComment():
         db.session.rollback() 
         return jsonify({'message': f'Failed to add the Comment:{e}'}), 401
 
+
+@app.route("/getUserData", methods=["POST"])
+@jwt_required()
+def getUserData():
+    data = request.get_json()
+    try:
+        user = User.query.filter_by(username=data["username"]).first()
+        user_feeds = []
+        for feed in user.feeds:
+            feed_data = {
+            'id': feed.id,
+            'heading': feed.heading,
+            'content': feed.content,
+            'created_by': feed.creator.username,
+            'created_at': feed.created_at
+            }
+            user_feeds.append(feed_data)
+
+        user_data = {
+        'id': user.id,
+        'username': user.username,
+        'email': user.email,
+        'feeds': user_feeds
+    }
+
+        return jsonify({'message': 'User data fetched successfully', 'user': user_data}), 201
+    except Exception as e:
+        return jsonify({'message': f'Failed to fetch user data:{e}'}), 401
+
 if __name__ == '__main__':
     app.run(debug=True)

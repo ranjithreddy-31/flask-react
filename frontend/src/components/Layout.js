@@ -2,6 +2,10 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { logout } from './Logout';
 import '../css/Layout.css';
+import '../css/AddFeed.css';
+import '../css/Common.css';
+import '../css/Feed.css';
+import '../css/Weather.css';
 
 function Layout({children}) {
   const navigate = useNavigate();
@@ -17,7 +21,7 @@ function Layout({children}) {
     <div className="layout">
       <nav className="navbar">
         <button className="nav-button" onClick={() => navigate('/home')}>Home</button>
-        <button className="nav-button logout" onClick={handleLogoutClick}>Logout</button>
+        <button className="nav-button logout" onClick={handleLogoutClick}>Logout</button>    
       </nav>
       <main className="main-content">
         {children}

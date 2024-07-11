@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { isTokenExpired } from './Utils';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import '../css/AddFeed.css';
 
 function AddFeed({onFeedAdded}) {
     const navigate = useNavigate();

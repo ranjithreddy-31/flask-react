@@ -2,7 +2,6 @@ import axios from 'axios';
 import React, { useState, useEffect } from 'react'
 import AddFeed from './AddFeed';
 import Layout from './Layout';
-import '../css/Feed.css';
 import Comments from './Comments';
 import { isTokenExpired } from './Utils';
 import { useNavigate } from 'react-router-dom';
@@ -32,7 +31,6 @@ function Feed() {
                         }
                     }
                 );
-                console.log(response.data);
                 setPosts(response.data.feeds);
                 setTotalPages(response.data.pages);
             } catch (error) {
@@ -86,6 +84,10 @@ function Feed() {
         }
     };
 
+    const handleUserClick = (username) =>{
+        navigate(`/profile/${username}`);
+    };
+
     return (
         <Layout>
             <div className="feed-container">
@@ -96,10 +98,19 @@ function Feed() {
                             <div key={post.id} className="post-item">
                                 <h3 className="post-heading">{post.heading}</h3>
                                 <p className="post-content">{post.content}</p>
-                                <p className="post-meta">By: {post.created_by} at {new Date(post.created_at).toLocaleString()}</p>
+                                <p className="post-meta">
+                                    By:{' '}
+                                    <button
+                                    onClick={() => handleUserClick(post.created_by)}
+                                    className="user-link"
+                                    >
+                                    {post.created_by}
+                                    </button>{' '}
+                                    at {new Date(post.created_at).toLocaleString()}
+                                </p>
                                 <button 
                                     onClick={() => setOpenComments(prevState => ({...prevState, [post.id]: !prevState[post.id]}))}
-                                    className="toggle-comments-button"
+                                    className="show-comments-toggle-link"
                                 >
                                     {openComments[post.id] ? 'Hide Comments' : 'Show Comments'}
                                 </button>

@@ -1,4 +1,6 @@
 import { jwtDecode } from 'jwt-decode';
+import axios from 'axios';
+
 export const isTokenExpired = () => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -20,3 +22,26 @@ export const isTokenExpired = () => {
     }
     return true;
 };
+
+export const getUserProfile = async(username) => {
+    try {
+        const token = localStorage.getItem('token');
+        if(isTokenExpired(token))
+        {
+            throw new Error('Token expired');
+        }
+        const response = await axios.post('http://127.0.0.1:5000/getUserData', {
+            username:username
+        }, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+    
+       return response.data
+    } catch (error) {
+        console.error('Error adding comment:', error);
+        return error
+    }
+  };

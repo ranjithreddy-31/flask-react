@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Layout from './Layout';
-import '../css/Common.css';
 import { isTokenExpired } from './Utils';
 
 function Calculator() {

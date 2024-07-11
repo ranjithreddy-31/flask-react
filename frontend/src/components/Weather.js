@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from './Layout';
-import axios from 'axios';
-import '../css/Weather.css';  
+import axios from 'axios';  
 
 import { isTokenExpired } from './Utils';
 

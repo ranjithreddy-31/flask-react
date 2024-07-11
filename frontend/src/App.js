@@ -9,6 +9,7 @@ import TodoList from './components/TodoList';
 import Calculator from './components/Calculator';
 import Weather from './components/Weather';
 import Feed from './components/Feed';
+import UserProfile from './components/UserProfile';
 
 const App = () => {
   return (
@@ -23,6 +24,7 @@ const App = () => {
         <Route path="/calculator" element={<PrivateRoute><Calculator /></PrivateRoute>} />
         <Route path="/weather" element={<PrivateRoute><Weather /></PrivateRoute>} />
         <Route path="/feed" element={<PrivateRoute><Feed/></PrivateRoute>} />
+        <Route path="/profile/:username" element={<PrivateRoute><UserProfile /></PrivateRoute>} />
       </Routes>
     </Router>
   );
