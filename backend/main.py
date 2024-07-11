@@ -399,13 +399,17 @@ def addFeed():
     except:
         return jsonify({'message': 'Failed to add the feed'}), 401
     
-@app.route("/getAllFeeds", methods=["GET"])
+@app.route("/getAllFeeds", methods=["POST"])
 @jwt_required()
 def getAllFeeds():
-    all_feeds = Feed.query.join(User).all()
-    all_feeds_list = []
+    data = request.get_json()
+    page = data.get('page', 1)
+    per_page = 2
     
-    for feed in all_feeds:
+    pagination = Feed.query.join(User).order_by(Feed.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
+    
+    all_feeds_list = []
+    for feed in pagination.items:
         comments = Comment.query.filter_by(feed_id=feed.id).join(User).all()
         comment_list = [{
             'id': comment.id,
@@ -415,15 +419,22 @@ def getAllFeeds():
         } for comment in comments]
         
         feed_data = {
-            'id': feed.id, 
-            'heading': feed.heading, 
-            'content': feed.content, 
+            'id': feed.id,
+            'heading': feed.heading,
+            'content': feed.content,
             'created_by': feed.creator.username,
             'created_at': feed.created_at,
             'comments': comment_list
         }
         all_feeds_list.append(feed_data)
-    return jsonify({'message': 'Successfully retrieved Feeds', 'feeds': all_feeds_list}), 200
+    return jsonify({
+        'message': 'Successfully retrieved Feeds',
+        'feeds': all_feeds_list,
+        'total': pagination.total,
+        'pages': pagination.pages,
+        'current_page': page
+    }), 200
+
 
 @app.route("/addComment", methods=["POST"])
 @jwt_required()
