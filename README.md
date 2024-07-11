@@ -3,7 +3,9 @@
 This project is a full-stack application built with Flask (for the backend) and React (for the frontend). It includes several endpoints for managing different functionalities such as Todo List, Expression Calculator, and Web Scraper.
 
 ## Features
-
+- **Fee:**
+  - Allows users to add a feed and comments under it.
+    
 - **Todo List:**
   - Allows users to add, delete, and mark tasks as completed.
   - Utilizes SQLite for local database storage.
