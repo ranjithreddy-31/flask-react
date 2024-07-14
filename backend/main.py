@@ -437,34 +437,8 @@ def getAllFeeds():
     per_page = 10**9
     
     pagination = Feed.query.join(User).order_by(Feed.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
-    
-    all_feeds_list = []
-    for feed in pagination.items:
-        comments = Comment.query.filter_by(feed_id=feed.id).join(User).all()
-        comment_list = [{
-            'id': comment.id,
-            'comment': comment.comment,
-            'added_by': comment.author.username,
-            'added_at': comment.added_at
-        } for comment in comments]
-        
-        feed_data = {
-            'id': feed.id,
-            'heading': feed.heading,
-            'content': feed.content,
-            'picture': feed.picture,
-            'created_by': feed.creator.username,
-            'created_at': feed.created_at,
-            'comments': comment_list
-        }
-        all_feeds_list.append(feed_data)
-    return jsonify({
-        'message': 'Successfully retrieved Feeds',
-        'feeds': all_feeds_list,
-        'total': pagination.total,
-        'pages': pagination.pages,
-        'current_page': page
-    }), 200
+    return jsonify_feeds(pagination)
+
 
 
 @app.route("/addComment", methods=["POST"])
@@ -491,27 +465,33 @@ def getUserData():
     data = request.get_json()
     try:
         user = User.query.filter_by(username=data["username"]).first()
-        user_feeds = []
-        for feed in user.feeds:
-            feed_data = {
-            'id': feed.id,
-            'heading': feed.heading,
-            'content': feed.content,
-            'created_by': feed.creator.username,
-            'created_at': feed.created_at
-            }
-            user_feeds.append(feed_data)
-
+        if not user:
+            return jsonify({'message': 'User not found'}), 404
+        
+        page = 1
+        per_page = 10  # Adjust per_page to your needs
+        pagination = Feed.query.filter_by(created_by=user.id).paginate(page=page, per_page=per_page, error_out=False)
+        
+        # Get the feeds response using the jsonify_feeds function
+        feeds_response = jsonify_feeds(pagination)
+        feeds_data = feeds_response.get_json()
+        
+        # Construct the user data including ID, username, and email
         user_data = {
-        'id': user.id,
-        'username': user.username,
-        'email': user.email,
-        'feeds': user_feeds
-    }
-
-        return jsonify({'message': 'User data fetched successfully', 'user': user_data}), 201
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'feeds': feeds_data['feeds'],
+            'total_feeds': feeds_data['total']
+        }
+        
+        return jsonify({
+            'message': 'Successfully retrieved user data',
+            'user': user_data
+        }), 200
     except Exception as e:
-        return jsonify({'message': f'Failed to fetch user data:{e}'}), 401
+        return jsonify({'message': f'Failed to fetch user data: {str(e)}'}), 500
+
 
 @app.route("/getCurrentUser", methods=["GET"])
 @jwt_required()
@@ -528,7 +508,38 @@ def getCurrentUser():
 
 @app.route('/uploads/<filename>', methods=["GET"])
 def uploaded_file(filename):
+    print('Here')
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+def jsonify_feeds(pagination):
+    all_feeds_list = []
+    for feed in pagination.items:
+        comments = Comment.query.filter_by(feed_id=feed.id).join(User).all()
+        comment_list = [{
+            'id': comment.id,
+            'comment': comment.comment,
+            'added_by': comment.author.username,
+            'added_at': comment.added_at
+        } for comment in comments]
+        
+        feed_data = {
+            'id': feed.id,
+            'heading': feed.heading,
+            'content': feed.content,
+            'picture': feed.picture,
+            'created_by': feed.creator.username,
+            'created_at': feed.created_at,
+            'comments': comment_list
+        }
+        all_feeds_list.append(feed_data)
+    return jsonify({
+        'message': 'Successfully retrieved Feeds',
+        'feeds': all_feeds_list,
+        'total': pagination.total,
+        'pages': pagination.pages,
+        'current_page': 1
+
+    })
 
 if __name__ == '__main__':
     app.run(debug=True)

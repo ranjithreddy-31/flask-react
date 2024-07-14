@@ -1,5 +1,5 @@
 .add-feed-container {
-    background-color: #f0f2f5; /* Changed to light grey */
+    background-color: #f0f2f5; /* Light grey background */
     border-radius: 8px;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
     padding: 12px;
@@ -9,25 +9,35 @@
 .add-feed-prompt {
     color: #65676b;
     font-size: 17px;
-    padding: 8px;
+    padding: 12px;
     border-radius: 20px;
-    background-color: #e4e6eb; /* Changed to a slightly darker grey */
+    background-color: #ffffff; /* White background for the prompt */
     cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.add-feed-prompt:hover {
+    background-color: #f2f3f5;
+}
+
+.add-feed-form {
+    display: flex;
+    flex-direction: column;
 }
 
 .feed-input {
     border: none;
     font-size: 16px;
-    padding: 8px;
+    padding: 12px;
     margin-bottom: 10px;
     resize: none;
-    background-color: #ffffff; /* Changed to white */
-    border-radius: 6px; /* Added for consistency */
+    background-color: #ffffff;
+    border-radius: 6px;
 }
 
 .feed-input:focus {
     outline: none;
-    box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.2); /* Added subtle focus effect */
+    box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.2);
 }
 
 .heading-input {
@@ -44,6 +54,7 @@
     align-items: center;
     border-top: 1px solid #e4e6eb;
     padding-top: 10px;
+    margin-top: 10px;
 }
 
 .action-button {
@@ -67,7 +78,7 @@
 
 .buttons-group {
     display: flex;
-    gap: 10px; /* This adds space between the cancel and post buttons */
+    gap: 10px;
 }
 
 .post-button {

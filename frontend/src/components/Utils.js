@@ -38,7 +38,6 @@ export const getUserProfile = async(username) => {
                 'Content-Type': 'application/json'
             }
         });
-    
        return response.data
     } catch (error) {
         console.error('Error adding comment:', error);
