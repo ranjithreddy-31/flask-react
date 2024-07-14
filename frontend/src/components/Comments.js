@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import "../css/Comment.css"
 function Comments({ comments }) {
   const navigate = useNavigate();
   const handleUserClick = (username) =>{

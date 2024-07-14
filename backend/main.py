@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 from flask_jwt_extended import JWTManager, create_access_token, get_jwt, jwt_required, unset_jwt_cookies, get_jwt_identity
 from flask_bcrypt import Bcrypt
 from sqlalchemy import text
@@ -12,6 +12,9 @@ from sumy.parsers.plaintext import PlaintextParser
 from sumy.nlp.tokenizers import Tokenizer
 from sumy.summarizers.lsa import LsaSummarizer
 import nltk
+import base64
+from werkzeug.utils import secure_filename
+import os
 
 from constants import WEATHER_API_KEY, SQLALCHEMY_DATABASE_URI, SECRET_KEY, JWT_SECRET_KEY
 
@@ -23,11 +26,13 @@ nltk.download('punkt')
 def initialize_app():
     """Initialize the Flask application, set up configurations, and create the database."""
     app = Flask(__name__)
-    CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})  # Enable CORS for localhost:3000
+    CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}}) # Enable CORS for localhost:3000
 
     app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
     app.config['SECRET_KEY'] = SECRET_KEY
     app.config['JWT_SECRET_KEY'] = JWT_SECRET_KEY
+    UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')
+    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
     db.init_app(app)
 
@@ -383,28 +388,53 @@ def getWeather():
     except Exception as e:
         return jsonify({'message': f'Failed to fetch weather information: {e}'}), 400
 
-@app.route("/addFeed", methods=["POST"])
+
+@app.route('/addFeed', methods=['POST'])
 @jwt_required()
-def addFeed():
+def add_feed():
     data = request.get_json()
-    heading = data['heading']
-    content = data['content']
-    user_id  = get_jwt_identity() 
+    heading = data.get('heading')
+    content = data.get('content')
+    photo_base64 = data.get('photo')
+    user_id = get_jwt_identity()
+
+    if not heading or not content:
+        return jsonify({'message': 'Heading and content are required'}), 400
+
     try:
         new_feed = Feed(heading=heading, content=content, created_by=user_id)
+
         db.session.add(new_feed)
+        db.session.flush()  # Ensure the feed ID is generated before committing
+
+        if photo_base64:
+            # Remove the "data:image/jpeg;base64," part
+            photo_data = photo_base64.split(',')[1]
+            photo_binary = base64.b64decode(photo_data)
+            
+            filename = secure_filename(f"feed_photo_{new_feed.id}.jpg")
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            print(filepath)
+            
+            with open(filepath, 'wb') as f:
+                f.write(photo_binary)
+            
+            new_feed.picture = filename
+
         db.session.commit()
 
         return jsonify({'message': 'Feed added successfully', 'feed_id': new_feed.id}), 201
-    except:
-        return jsonify({'message': 'Failed to add the feed'}), 401
-    
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error adding feed: {str(e)}")
+        return jsonify({'message': 'Failed to add the feed'}), 500
+
 @app.route("/getAllFeeds", methods=["POST"])
 @jwt_required()
 def getAllFeeds():
     data = request.get_json()
     page = data.get('page', 1)
-    per_page = 2
+    per_page = 10**9
     
     pagination = Feed.query.join(User).order_by(Feed.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
     
@@ -422,6 +452,7 @@ def getAllFeeds():
             'id': feed.id,
             'heading': feed.heading,
             'content': feed.content,
+            'picture': feed.picture,
             'created_by': feed.creator.username,
             'created_at': feed.created_at,
             'comments': comment_list
@@ -481,6 +512,23 @@ def getUserData():
         return jsonify({'message': 'User data fetched successfully', 'user': user_data}), 201
     except Exception as e:
         return jsonify({'message': f'Failed to fetch user data:{e}'}), 401
+
+@app.route("/getCurrentUser", methods=["GET"])
+@jwt_required()
+def getCurrentUser():
+    user_id = get_jwt_identity()
+    try:
+        user = User.query.filter_by(id=user_id).first()
+        if user:
+            return jsonify({"message": "successfully fetched the user", "username": user.username}), 200
+        else:
+            return jsonify({"message": "User not found"}), 404
+    except Exception as e:
+        return jsonify({'message': f'Failed to fetch user data: {e}'}), 500
+
+@app.route('/uploads/<filename>', methods=["GET"])
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 if __name__ == '__main__':
     app.run(debug=True)

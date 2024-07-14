@@ -14,6 +14,7 @@ function Feed() {
     const [openComments, setOpenComments] = useState({});
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [isAuthorized, setIsAuthorized] = useState(false);
 
     useEffect(() => {
         const fetchPosts = async () => {
@@ -22,6 +23,7 @@ function Feed() {
                 if(isTokenExpired(token)) {
                     navigate('/login')
                 }
+                setIsAuthorized(true);
                 const response = await axios.post('http://127.0.0.1:5000/getAllFeeds', 
                     { page: currentPage },
                     {
@@ -39,7 +41,6 @@ function Feed() {
         };
         fetchPosts();
     }, [refreshTrigger, currentPage, navigate])    
-    
 
     const handleFeedAdded = () => {
         setRefreshTrigger(prev => prev + 1);
@@ -71,8 +72,8 @@ function Feed() {
             console.error('Error adding comment:', error);
         }
     };
+
     const handleNextPage = () => {
-        console.log(currentPage, totalPages)
         if (currentPage < totalPages) {
             setCurrentPage(prev => prev + 1);
         }
@@ -91,57 +92,61 @@ function Feed() {
     return (
         <Layout>
             <div className="feed-container">
-                <div className="posts-section">
-                    <h2 className="posts-heading">All Feeds</h2>
-                    <div className="posts-list">
-                    {posts.map(post => (
-                            <div key={post.id} className="post-item">
-                                <h3 className="post-heading">{post.heading}</h3>
-                                <p className="post-content">{post.content}</p>
-                                <p className="post-meta">
-                                    By:{' '}
-                                    <button
-                                    onClick={() => handleUserClick(post.created_by)}
-                                    className="user-link"
-                                    >
-                                    {post.created_by}
-                                    </button>{' '}
-                                    at {new Date(post.created_at).toLocaleString()}
-                                </p>
-                                <button 
-                                    onClick={() => setOpenComments(prevState => ({...prevState, [post.id]: !prevState[post.id]}))}
-                                    className="show-comments-toggle-link"
-                                >
-                                    {openComments[post.id] ? 'Hide Comments' : 'Show Comments'}
-                                </button>
-                                {openComments[post.id] && <Comments comments={post.comments} />}
-                                <div className="comment-section">
-                                    <textarea
-                                        value={comments[post.id] || ''}
-                                        onChange={(e) => handleCommentChange(post.id, e.target.value)}
-                                        placeholder="Add a comment..."
-                                        className="comment-input"
-                                    />
-                                    <button 
-                                        onClick={() => handleAddComment(post.id)}
-                                        className="comment-button"
-                                    >
-                                        Add Comment
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                    <div className="pagination">
-                    <button onClick={handlePrevPage} disabled={currentPage === 1}>Previous</button>
-                    <span>Page {currentPage} of {totalPages}</span>
-                    <button onClick={handleNextPage} disabled={currentPage === totalPages}>Next</button>
-                </div>
-                </div>
-                
                 <div className="add-feed-section">
-                    <h2 className="posts-heading">Any Feeds?</h2>
                     <AddFeed onFeedAdded={handleFeedAdded} />
+                </div>
+                <div className="posts-section">
+                    {posts.map(post => (
+                        <div key={post.id} className="post-item">
+                            <h3 className="post-heading">{post.heading}</h3>
+                            <p className="post-content">{post.content}</p>
+                            {post.picture && isAuthorized &&(
+                                <div className="post-image-container">
+                                    <img 
+                                        src={`http://127.0.0.1:5000/uploads/${post.picture}`} 
+                                        alt="Post" 
+                                        className="post-image"
+                                    />
+                                </div>
+                            )}
+                            <p className="post-meta">
+                                By:{' '}
+                                <button
+                                onClick={() => handleUserClick(post.created_by)}
+                                className="user-link"
+                                >
+                                {post.created_by}
+                                </button>{' '}
+                                at {new Date(post.created_at).toLocaleString()}
+                            </p>
+                            <button 
+                                onClick={() => setOpenComments(prevState => ({...prevState, [post.id]: !prevState[post.id]}))}
+                                className="show-comments-toggle-link"
+                            >
+                                {openComments[post.id] ? 'Hide Comments' : 'Show Comments'}
+                            </button>
+                            {openComments[post.id] && <Comments comments={post.comments} />}
+                            <div className="comment-section">
+                                <textarea
+                                    value={comments[post.id] || ''}
+                                    onChange={(e) => handleCommentChange(post.id, e.target.value)}
+                                    placeholder="Add a comment..."
+                                    className="comment-input"
+                                />
+                                <button 
+                                    onClick={() => handleAddComment(post.id)}
+                                    className="comment-button"
+                                >
+                                    Add Comment
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+                    <div className="pagination">
+                        <button onClick={handlePrevPage} disabled={currentPage === 1}>Previous</button>
+                        <span>Page {currentPage} of {totalPages}</span>
+                        <button onClick={handleNextPage} disabled={currentPage === totalPages}>Next</button>
+                    </div>
                 </div>
             </div>
         </Layout>

@@ -22,6 +22,7 @@ class Feed(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     heading = db.Column(db.String(100), nullable=False)
     content = db.Column(db.String(300), nullable=False)
+    picture = db.Column(db.String(255), nullable=True)
     created_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     comments = db.relationship('Comment', backref='post', lazy=True)
