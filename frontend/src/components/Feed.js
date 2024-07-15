@@ -2,8 +2,7 @@ import axios from 'axios';
 import React, { useState, useEffect } from 'react'
 import AddFeed from './AddFeed';
 import Layout from './Layout';
-import Comments from './Comments';
-import { isTokenExpired } from './Utils';
+import { deletePost, getCurrentUser, isTokenExpired, showFeeds } from './Utils';
 import { useNavigate } from 'react-router-dom';
 
 function Feed() {
@@ -15,13 +14,16 @@ function Feed() {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [isAuthorized, setIsAuthorized] = useState(false);
+    const [openMenus, setOpenMenus] = useState({});
+    const [currentUser, setCurrentUser] = useState(null);
 
     useEffect(() => {
         const fetchPosts = async () => {
             try {
                 const token = localStorage.getItem('token');
                 if(isTokenExpired(token)) {
-                    navigate('/login')
+                    navigate('/login');
+                    return;
                 }
                 setIsAuthorized(true);
                 const response = await axios.post('http://127.0.0.1:5000/getAllFeeds', 
@@ -37,10 +39,18 @@ function Feed() {
                 setTotalPages(response.data.pages);
             } catch (error) {
                 console.error('Error fetching posts:', error);
+                if (error.response && error.response.status === 401) {
+                    navigate('/login');
+                }
             }
         };
+        const fetchCurrentUser = async () => {
+            const user = await getCurrentUser();
+            setCurrentUser(user);
+        };
         fetchPosts();
-    }, [refreshTrigger, currentPage, navigate])    
+        fetchCurrentUser();
+    }, [refreshTrigger, currentPage, navigate]);
 
     const handleFeedAdded = () => {
         setRefreshTrigger(prev => prev + 1);
@@ -53,9 +63,9 @@ function Feed() {
     const handleAddComment = async (feedId) => {
         try {
             const token = localStorage.getItem('token');
-            if(isTokenExpired(token))
-            {
-                navigate('/login')
+            if(isTokenExpired(token)) {
+                navigate('/login');
+                return;
             }
             await axios.post('http://127.0.0.1:5000/addComment', {
                 feed_id: feedId,
@@ -70,6 +80,9 @@ function Feed() {
             setRefreshTrigger(prev => prev + 1);
         } catch (error) {
             console.error('Error adding comment:', error);
+            if (error.response && error.response.status === 401) {
+                navigate('/login');
+            }
         }
     };
 
@@ -85,7 +98,20 @@ function Feed() {
         }
     };
 
-    const handleUserClick = (username) =>{
+    const handleEditPost = () =>{
+        console.log("editing the post")
+    }
+
+    const handleDeletePost = async(postId) =>{
+        const token = localStorage.getItem('token');
+        if(isTokenExpired(token)){
+            navigate('/');
+        }
+        await deletePost(postId, token);
+        console.log("deleted the post");
+        setRefreshTrigger(prev => prev+1);
+    }
+    const handleUserClick = (username) => {
         navigate(`/profile/${username}`);
     };
 
@@ -95,62 +121,29 @@ function Feed() {
                 <div className="add-feed-section">
                     <AddFeed onFeedAdded={handleFeedAdded} />
                 </div>
-                <div className="posts-section">
-                    {posts.map(post => (
-                        <div key={post.id} className="post-item">
-                            <h3 className="post-heading">{post.heading}</h3>
-                            <p className="post-content">{post.content}</p>
-                            {post.picture && isAuthorized &&(
-                                <div className="post-image-container">
-                                    <img 
-                                        src={`http://127.0.0.1:5000/uploads/${post.picture}`} 
-                                        alt="Post" 
-                                        className="post-image"
-                                    />
-                                </div>
-                            )}
-                            <p className="post-meta">
-                                By:{' '}
-                                <button
-                                onClick={() => handleUserClick(post.created_by)}
-                                className="user-link"
-                                >
-                                {post.created_by}
-                                </button>{' '}
-                                at {new Date(post.created_at).toLocaleString()}
-                            </p>
-                            <button 
-                                onClick={() => setOpenComments(prevState => ({...prevState, [post.id]: !prevState[post.id]}))}
-                                className="show-comments-toggle-link"
-                            >
-                                {openComments[post.id] ? 'Hide Comments' : 'Show Comments'}
-                            </button>
-                            {openComments[post.id] && <Comments comments={post.comments} />}
-                            <div className="comment-section">
-                                <textarea
-                                    value={comments[post.id] || ''}
-                                    onChange={(e) => handleCommentChange(post.id, e.target.value)}
-                                    placeholder="Add a comment..."
-                                    className="comment-input"
-                                />
-                                <button 
-                                    onClick={() => handleAddComment(post.id)}
-                                    className="comment-button"
-                                >
-                                    Add Comment
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-                    <div className="pagination">
-                        <button onClick={handlePrevPage} disabled={currentPage === 1}>Previous</button>
-                        <span>Page {currentPage} of {totalPages}</span>
-                        <button onClick={handleNextPage} disabled={currentPage === totalPages}>Next</button>
-                    </div>
+                {showFeeds(
+                    posts,
+                    isAuthorized,
+                    openComments,
+                    setOpenComments,
+                    comments,
+                    handleCommentChange,
+                    handleAddComment,
+                    handleUserClick,
+                    currentPage,
+                    totalPages,
+                    handlePrevPage,
+                    handleNextPage,
+                    handleEditPost,
+                    handleDeletePost,
+                    currentUser,
+                    openMenus,
+                    setOpenMenus
+                )}       
+                            
                 </div>
-            </div>
         </Layout>
     )
 }
 
-export default Feed
+export default Feed;

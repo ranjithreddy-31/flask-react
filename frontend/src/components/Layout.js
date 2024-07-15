@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { logout } from './Logout';
-import { isTokenExpired } from './Utils';
-import axios from 'axios';
+import { getCurrentUser } from './Utils';
 
 import '../css/Layout.css';
 import '../css/AddFeed.css';
@@ -13,6 +12,7 @@ import '../css/Weather.css';
 function Layout({ children }) {
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   const handleLogoutClick = async () => {
     const success = await logout();
@@ -22,44 +22,32 @@ function Layout({ children }) {
   };
 
   const getUserProfile = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token || isTokenExpired(token)) {
-        navigate('/');
-        return;
-      }
-
-      const response = await axios.get(
-        'http://127.0.0.1:5000/getCurrentUser',
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-
-      const username = response.data.username;
+      const username = getCurrentUser();
       navigate(`/profile/${username}`);
-    } catch (error) {
-      if (error.response && error.response.status === 401) {
-        console.log('Token is invalid or expired. Redirecting to login.');
-        navigate('/');
-      } else {
-        console.log(`Error occurred while fetching user profile: ${error}`);
-      }
-    }
   };
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
+  const closeDropdown = (e) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+      setIsDropdownOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', closeDropdown);
+    return () => {
+      document.removeEventListener('mousedown', closeDropdown);
+    };
+  }, []);
+
   return (
     <div className="layout">
       <nav className="navbar">
         <button className="nav-button" onClick={() => navigate('/home')}>Home</button>
-        <div className="dropdown">
+        <div className="dropdown" ref={dropdownRef}>
           <button className="nav-button dropdown-toggle" onClick={toggleDropdown}>
             Account
           </button>

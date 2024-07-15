@@ -541,5 +541,20 @@ def jsonify_feeds(pagination):
 
     })
 
+@app.route("/deleteFeed", methods = ["DELETE"])
+@jwt_required()
+def deleteFeed():
+    data = request.get_json()
+    postId = data["postId"]
+    try:
+        post = Feed.query.get(postId)
+        db.session.delete(post)
+        db.session.commit()
+
+        return jsonify({"message": "Post deleted successfully"}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": f"An error occurred: {str(e)}"}), 500
 if __name__ == '__main__':
     app.run(debug=True)

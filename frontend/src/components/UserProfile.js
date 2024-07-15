@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import { isTokenExpired, getUserProfile } from './Utils';
+import { isTokenExpired, getUserProfile, showFeeds, deletePost } from './Utils';
 import Layout from './Layout';
-import Comments from './Comments'; // Make sure to import the Comments component if it exists
-import '../css/Feed.css'
+import '../css/Feed.css';
 
 function UserProfile() {
     const [user, setUser] = useState(null);
@@ -12,6 +11,7 @@ function UserProfile() {
     const [openComments, setOpenComments] = useState({});
     const [comments, setComments] = useState({});
     const [refreshTrigger, setRefreshTrigger] = useState(0);
+    const [openMenus, setOpenMenus] = useState({});
     const { username } = useParams();
     const navigate = useNavigate();
 
@@ -47,6 +47,7 @@ function UserProfile() {
             const token = localStorage.getItem('token');
             if(isTokenExpired(token)) {
                 navigate('/login');
+                return;
             }
             await axios.post('http://127.0.0.1:5000/addComment', {
                 feed_id: feedId,
@@ -61,11 +62,28 @@ function UserProfile() {
             setRefreshTrigger(prev => prev + 1);
         } catch (error) {
             console.error('Error adding comment:', error);
+            if (error.response && error.response.status === 401) {
+                navigate('/login');
+            }
         }
     };
 
-    if (error) return <div>Error: {error}</div>;
-    if (!user) return <div>Loading...</div>;
+    const handleEditPost = (postId) => {
+        // Implement edit post functionality
+        console.log('Edit post:', postId);
+    };
+
+    const handleDeletePost = async(postId) => {
+        const token = localStorage.getItem('token');
+        if(isTokenExpired(token)){
+            navigate('/');
+        }
+        await deletePost(postId, token);
+        setRefreshTrigger(prev => prev+1);
+    };
+
+    if (error) return <div className="alert alert-danger">Error: {error}</div>;
+    if (!user) return <div className="alert alert-info">Loading...</div>;
 
     return (
         <Layout>
@@ -79,59 +97,27 @@ function UserProfile() {
                 <div className="feeds-section">
                     <h2>Feeds</h2>
                     {user.feeds && user.feeds.length > 0 ? (
-                        user.feeds.map((post) => (
-                            <div key={post.id} className="feed-item">
-                                <h3 className="post-heading">{post.heading}</h3>
-                                <p className="post-content">{post.content}</p>
-                                {post.picture && (
-                                    <div className="post-image-container">
-                                        <img
-                                            src={`http://127.0.0.1:5000/uploads/${post.picture}`}
-                                            alt="Post"
-                                            className="post-image"
-                                        />
-                                    </div>
-                                )}
-                                <p className="post-meta">
-                                    By:{' '}
-                                    <button
-                                        onClick={() => handleUserClick(post.created_by)}
-                                        className="user-link"
-                                    >
-                                        {post.created_by}
-                                    </button>{' '}
-                                    at {new Date(post.created_at).toLocaleString()}
-                                </p>
-                                <button
-                                    onClick={() =>
-                                        setOpenComments((prevState) => ({
-                                            ...prevState,
-                                            [post.id]: !prevState[post.id],
-                                        }))
-                                    }
-                                    className="show-comments-toggle-link"
-                                >
-                                    {openComments[post.id] ? 'Hide Comments' : 'Show Comments'}
-                                </button>
-                                {openComments[post.id] && <Comments comments={post.comments} />}
-                                <div className="comment-section">
-                                    <textarea
-                                        value={comments[post.id] || ''}
-                                        onChange={(e) => handleCommentChange(post.id, e.target.value)}
-                                        placeholder="Add a comment..."
-                                        className="comment-input"
-                                    />
-                                    <button
-                                        onClick={() => handleAddComment(post.id)}
-                                        className="comment-button"
-                                    >
-                                        Add Comment
-                                    </button>
-                                </div>
-                            </div>
-                        ))
+                        showFeeds(
+                            user.feeds,
+                            true, // isAuthorized
+                            openComments,
+                            setOpenComments,
+                            comments,
+                            handleCommentChange,
+                            handleAddComment,
+                            handleUserClick,
+                            1, // currentPage (not applicable for profile view)
+                            1, // totalPages (not applicable for profile view)
+                            () => {}, // handlePrevPage (not applicable for profile view)
+                            () => {}, // handleNextPage (not applicable for profile view)
+                            handleEditPost,
+                            handleDeletePost,
+                            username, // currentUser
+                            openMenus,
+                            setOpenMenus
+                        )
                     ) : (
-                        <p>No feeds available.</p>
+                        <p className="alert alert-info">No feeds available.</p>
                     )}
                 </div>
             </div>
