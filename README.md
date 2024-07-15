@@ -5,6 +5,9 @@ This project is a full-stack application built with Flask (for the backend) and 
 ## Features
 - **Fee:**
   - Allows users to add a feed and comments under it.
+  - Update [07/15/2024]
+    - Users can add photos in their posts and can view profiles
+    - Users should be able to delete their posts now
     
 - **Todo List:**
   - Allows users to add, delete, and mark tasks as completed.
