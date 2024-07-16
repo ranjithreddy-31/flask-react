@@ -90,7 +90,15 @@ export const showFeeds = (
     handleDeletePost, 
     currentUser,
     openMenus,
-    setOpenMenus
+    setOpenMenus,
+    editingPost,
+    editHeading,
+    setEditHeading,
+    editContent,
+    setEditContent,
+    handleUpdatePost,
+    handlePhotoChange,
+    editPhotoPreview
 ) => {
     const toggleMenu = (postId) => {
         setOpenMenus(prevState => ({
@@ -103,7 +111,17 @@ export const showFeeds = (
             {posts.map(post => (
                 <div key={post.id} className="post-item">
                     <div className="post-header">
-                        <h3 className="post-heading">{post.heading}</h3>
+                        {editingPost === post.id ? (
+                            <input
+                                type="text"
+                                value={editHeading}
+                                onChange={(e) => setEditHeading(e.target.value)}
+                                className="edit-heading-input"
+                                placeholder="Edit heading"
+                            />
+                        ) : (
+                            <h3 className="post-heading">{post.heading}</h3>
+                        )}
                         <div className="post-menu">
                             <button onClick={() => toggleMenu(post.id)} className="menu-toggle">
                                 ⋮
@@ -111,7 +129,7 @@ export const showFeeds = (
                             {openMenus[post.id] && (
                                 <div className="menu-dropdown">
                                     <button 
-                                        onClick={() => handleEditPost(post.id)} 
+                                        onClick={() => handleEditPost(post.id, post.heading, post.content, post.picture)} 
                                         disabled={currentUser !== post.created_by}
                                     >
                                         Edit
@@ -125,17 +143,63 @@ export const showFeeds = (
                                 </div>
                             )}
                         </div>
-
                     </div>
-                    <p className="post-content">{post.content}</p>
-                    {post.picture && isAuthorized && (
-                        <div className="post-image-container">
-                            <img 
-                                src={`http://127.0.0.1:5000/uploads/${post.picture}`} 
-                                alt="Post" 
-                                className="post-image"
-                            />
+                    {editingPost === post.id ? (
+                        <div className="edit-post-container">
+                            <form className="edit-post-form">
+                                <input
+                                    type="text"
+                                    value={editHeading}
+                                    onChange={(e) => setEditHeading(e.target.value)}
+                                    className="edit-heading-input"
+                                    placeholder="Edit heading"
+                                />
+                                <textarea
+                                    value={editContent}
+                                    onChange={(e) => setEditContent(e.target.value)}
+                                    className="edit-content-textarea"
+                                    placeholder="Edit content"
+                                />
+                                <div className="feed-actions">
+                                    <label className="photo-button action-button">
+                                        <input
+                                            type="file"
+                                            onChange={handlePhotoChange}
+                                            accept="image/*"
+                                            style={{ display: 'none' }}
+                                        />
+                                        <i className="fas fa-image"></i> Photo
+                                    </label>
+                                    <div className="buttons-group">
+                                        <button onClick={() => handleUpdatePost(post.id)} className="post-button action-button">
+                                            Update
+                                        </button>
+                                        <button onClick={() => handleEditPost(null)} className="cancel-button action-button">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                                {editPhotoPreview && (
+                                    <div className="photo-preview">
+                                        <img src={editPhotoPreview} alt="New photo preview" className="edit-photo-preview" />
+                                        <p>New photo selected</p>
+                                    </div>
+                                )}
+                            </form>
                         </div>
+                    )  : (
+                        <>
+                            <p className="post-content">{post.content}</p>
+                            {post.picture && isAuthorized && (
+                                <div className="post-image-container">
+                                    <img 
+                                        src={`http://127.0.0.1:5000/uploads/${post.picture}`} 
+                                        alt="Post" 
+                                        className="post-image"
+                                    />
+                                </div>
+                            )}
+                        </>
                     )}
                     <p className="post-meta">
                         By:{' '}
@@ -181,6 +245,7 @@ export const showFeeds = (
     );
 };
 
+
 export const deletePost = async(postId, token) => {
     try{
         await axios.delete('http://127.0.0.1:5000/deleteFeed', {
@@ -196,5 +261,23 @@ export const deletePost = async(postId, token) => {
     }
     catch(error){
         console.error('Error deleting post:', error);
+    }
+};
+
+export const updateFeed = async (postId, formData, token) => {
+    try {
+        const response = await axios.put(`http://127.0.0.1:5000/updateFeed/${postId}`, 
+            formData,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data'
+                }
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error('Error updating feed:', error);
+        throw error;
     }
 };

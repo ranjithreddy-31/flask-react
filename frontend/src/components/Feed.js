@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useState, useEffect } from 'react'
 import AddFeed from './AddFeed';
 import Layout from './Layout';
-import { deletePost, getCurrentUser, isTokenExpired, showFeeds } from './Utils';
+import { deletePost, getCurrentUser, isTokenExpired, showFeeds, updateFeed } from './Utils';
 import { useNavigate } from 'react-router-dom';
 
 function Feed() {
@@ -16,6 +16,14 @@ function Feed() {
     const [isAuthorized, setIsAuthorized] = useState(false);
     const [openMenus, setOpenMenus] = useState({});
     const [currentUser, setCurrentUser] = useState(null);
+    const [editingPost, setEditingPost] = useState(null);
+    const [editHeading, setEditHeading] = useState('');
+    const [editContent, setEditContent] = useState('');
+    const [editPhoto, setEditPhoto] = useState(null);
+    const [editPhotoPreview, setEditPhotoPreview] = useState(null);
+
+
+
 
     useEffect(() => {
         const fetchPosts = async () => {
@@ -98,9 +106,24 @@ function Feed() {
         }
     };
 
-    const handleEditPost = () =>{
-        console.log("editing the post")
-    }
+    const handleEditPost = (postId, heading, content, picture) => {
+        setEditingPost(postId);
+        setEditHeading(heading);
+        setEditContent(content);
+        setEditPhoto(picture);
+    };
+
+    const handlePhotoChange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            setEditPhoto(file);
+            // Create a preview URL for the selected image
+            const previewURL = URL.createObjectURL(file);
+            setEditPhotoPreview(previewURL);
+        }
+    };
+    
+    
 
     const handleDeletePost = async(postId) =>{
         const token = localStorage.getItem('token');
@@ -114,6 +137,37 @@ function Feed() {
     const handleUserClick = (username) => {
         navigate(`/profile/${username}`);
     };
+
+    const handleUpdatePost = async (postId) => {
+        try {
+            const token = localStorage.getItem('token');
+            if(isTokenExpired(token)) {
+                navigate('/login');
+                return;
+            }
+            const formData = new FormData();
+            formData.append('heading', editHeading);
+            formData.append('content', editContent);
+            if (editPhoto instanceof File) {
+                formData.append('photo', editPhoto);
+            } else if (editPhoto) {
+                formData.append('photo', editPhoto);
+            }
+            await updateFeed(postId, formData, token);
+            setEditingPost(null);
+            setEditHeading('');
+            setEditContent('');
+            setEditPhoto(null);
+            setEditPhotoPreview(null);
+            setRefreshTrigger(prev => prev + 1);
+        } catch (error) {
+            console.error('Error updating post:', error);
+            if (error.response && error.response.status === 401) {
+                navigate('/login');
+            }
+        }
+    };
+    
 
     return (
         <Layout>
@@ -138,7 +192,15 @@ function Feed() {
                     handleDeletePost,
                     currentUser,
                     openMenus,
-                    setOpenMenus
+                    setOpenMenus,
+                    editingPost,
+                    editHeading,
+                    setEditHeading,
+                    editContent,
+                    setEditContent,
+                    handleUpdatePost,
+                    handlePhotoChange,
+                    editPhotoPreview
                 )}       
                             
                 </div>

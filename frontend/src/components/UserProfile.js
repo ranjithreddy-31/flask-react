@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import { isTokenExpired, getUserProfile, showFeeds, deletePost } from './Utils';
+import { isTokenExpired, getUserProfile, showFeeds, deletePost, updateFeed } from './Utils';
 import Layout from './Layout';
 import '../css/Feed.css';
 
@@ -12,6 +12,11 @@ function UserProfile() {
     const [comments, setComments] = useState({});
     const [refreshTrigger, setRefreshTrigger] = useState(0);
     const [openMenus, setOpenMenus] = useState({});
+    const [editingPost, setEditingPost] = useState(null);
+    const [editHeading, setEditHeading] = useState('');
+    const [editContent, setEditContent] = useState('');
+    const [editPhoto, setEditPhoto] = useState(null);
+    const [editPhotoPreview, setEditPhotoPreview] = useState(null);
     const { username } = useParams();
     const navigate = useNavigate();
 
@@ -68,9 +73,51 @@ function UserProfile() {
         }
     };
 
-    const handleEditPost = (postId) => {
-        // Implement edit post functionality
-        console.log('Edit post:', postId);
+    const handleEditPost = (postId, heading, content, photo) => {
+        setEditingPost(postId);
+        setEditHeading(heading);
+        setEditContent(content);
+        setEditPhoto(photo);
+        setEditPhotoPreview(photo ? `http://127.0.0.1:5000/uploads/${photo}` : null);
+    };
+
+    const handlePhotoChange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            setEditPhoto(file);
+            const previewURL = URL.createObjectURL(file);
+            setEditPhotoPreview(previewURL);
+        }
+    };    
+
+    const handleUpdatePost = async (postId) => {
+        try {
+            const token = localStorage.getItem('token');
+            if(isTokenExpired(token)) {
+                navigate('/login');
+                return;
+            }
+            const formData = new FormData();
+            formData.append('heading', editHeading);
+            formData.append('content', editContent);
+            if (editPhoto instanceof File) {
+                formData.append('photo', editPhoto);
+            } else if (editPhoto) {
+                formData.append('photo', editPhoto);
+            }
+            await updateFeed(postId, formData, token);
+            setEditingPost(null);
+            setEditHeading('');
+            setEditContent('');
+            setEditPhoto(null);
+            setEditPhotoPreview(null);
+            setRefreshTrigger(prev => prev + 1);
+        } catch (error) {
+            console.error('Error updating post:', error);
+            if (error.response && error.response.status === 401) {
+                navigate('/login');
+            }
+        }
     };
 
     const handleDeletePost = async(postId) => {
@@ -114,7 +161,15 @@ function UserProfile() {
                             handleDeletePost,
                             username, // currentUser
                             openMenus,
-                            setOpenMenus
+                            setOpenMenus,
+                            editingPost,
+                            editHeading,
+                            setEditHeading,
+                            editContent,
+                            setEditContent,
+                            handleUpdatePost,
+                            handlePhotoChange,
+                            editPhotoPreview
                         )
                     ) : (
                         <p className="alert alert-info">No feeds available.</p>

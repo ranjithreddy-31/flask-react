@@ -545,16 +545,51 @@ def jsonify_feeds(pagination):
 @jwt_required()
 def deleteFeed():
     data = request.get_json()
-    postId = data["postId"]
+    FeedId = data["postId"]
     try:
-        post = Feed.query.get(postId)
-        db.session.delete(post)
+        feed = Feed.query.get(FeedId)
+        db.session.delete(feed)
         db.session.commit()
 
-        return jsonify({"message": "Post deleted successfully"}), 200
+        return jsonify({"message": "Fedd deleted successfully"}), 200
 
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": f"An error occurred: {str(e)}"}), 500
+
+@app.route('/updateFeed/<int:feedId>', methods=['PUT'])
+@jwt_required()
+def update_feed(feedId):
+    current_user = get_jwt_identity()
+
+    feed = Feed.query.get(feedId)
+    if not feed:
+        return jsonify({'error': 'Feed not found'}), 404
+
+    if feed.created_by != current_user:
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    heading = request.form.get('heading')
+    content = request.form.get('content')
+
+    if not heading or not content:
+        return jsonify({'error': 'Heading and content are required'}), 400
+
+    feed.heading = heading
+    feed.content = content
+    print(request.files)
+    if 'photo' in request.files:
+        photo = request.files['photo']
+        if photo:
+            filename = secure_filename(f"feed_photo_{feed.id}_{photo.filename}")
+            photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            feed.picture = filename
+
+    db.session.commit()
+
+    return jsonify({'message': 'Feed updated successfully'}), 200
+
+
+
 if __name__ == '__main__':
     app.run(debug=True)
