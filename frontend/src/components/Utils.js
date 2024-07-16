@@ -104,19 +104,28 @@ export const showFeeds = (
                 <div key={post.id} className="post-item">
                     <div className="post-header">
                         <h3 className="post-heading">{post.heading}</h3>
-                        {currentUser === post.created_by && (
-                            <div className="post-menu">
-                                <button onClick={() => toggleMenu(post.id)} className="menu-toggle">
-                                    ⋮
-                                </button>
-                                {openMenus[post.id] && (
-                                    <div className="menu-dropdown">
-                                        <button onClick={() => handleEditPost(post.id)}>Edit</button>
-                                        <button onClick={() => handleDeletePost(post.id)}>Delete</button>
-                                    </div>
-                                )}
-                            </div>
-                        )}
+                        <div className="post-menu">
+                            <button onClick={() => toggleMenu(post.id)} className="menu-toggle">
+                                ⋮
+                            </button>
+                            {openMenus[post.id] && (
+                                <div className="menu-dropdown">
+                                    <button 
+                                        onClick={() => handleEditPost(post.id)} 
+                                        disabled={currentUser !== post.created_by}
+                                    >
+                                        Edit
+                                    </button>
+                                    <button 
+                                        onClick={() => handleDeletePost(post.id)} 
+                                        disabled={currentUser !== post.created_by}
+                                    >
+                                        Delete
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
                     </div>
                     <p className="post-content">{post.content}</p>
                     {post.picture && isAuthorized && (

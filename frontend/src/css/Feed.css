@@ -210,3 +210,8 @@ body, html {
 .menu-dropdown button:hover {
     background-color: #f0f0f0;
 }
+
+.menu-dropdown button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
