@@ -22,7 +22,7 @@ function Layout({ children }) {
   };
 
   const getUserProfile = async () => {
-      const username = getCurrentUser();
+      const username = await getCurrentUser();
       navigate(`/profile/${username}`);
   };
 

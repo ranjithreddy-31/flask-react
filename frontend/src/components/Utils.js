@@ -181,7 +181,7 @@ export const showFeeds = (
                                 </div>
                                 {editPhotoPreview && (
                                     <div className="photo-preview">
-                                        <img src={editPhotoPreview} alt="New photo preview" className="edit-photo-preview" />
+                                        <img src={editPhotoPreview} alt="Updated file" className="edit-photo-preview" />
                                         <p>New photo selected</p>
                                     </div>
                                 )}

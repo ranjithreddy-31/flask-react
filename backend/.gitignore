@@ -10,3 +10,4 @@
 # misc
 .pylintrc
 constants.py
+/photos
