@@ -26,14 +26,16 @@ export const isTokenExpired = () => {
     return true;
 };
 
-export const getUserProfile = async(username) => {
+export const getUserProfile = async(username, groupCode) => {
     try {
         const token = localStorage.getItem('token');
         if(isTokenExpired(token)) {
             throw new Error('Token expired');
         }
+        console.log(groupCode)
         const response = await axios.post('http://127.0.0.1:5000/getUserData', {
-            username: username
+            username: username,
+            groupCode: groupCode
         }, {
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -98,7 +100,8 @@ export const showFeeds = (
     setEditContent,
     handleUpdatePost,
     handlePhotoChange,
-    editPhotoPreview
+    editPhotoPreview,
+    groupCode
 ) => {
     const toggleMenu = (postId) => {
         setOpenMenus(prevState => ({
@@ -217,7 +220,7 @@ export const showFeeds = (
                     >
                         {openComments[post.id] ? 'Hide Comments' : 'Show Comments'}
                     </button>
-                    {openComments[post.id] && <Comments comments={post.comments} />}
+                    {openComments[post.id] && <Comments comments={post.comments} groupCode={groupCode}/>}
                     <div className="comment-section">
                         <textarea
                             value={comments[post.id] || ''}

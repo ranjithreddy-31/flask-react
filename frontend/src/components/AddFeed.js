@@ -3,7 +3,7 @@ import { isTokenExpired } from './Utils';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-function AddFeed({onFeedAdded}) {
+function AddFeed({onFeedAdded, groupCode}) {
     const navigate = useNavigate();
     const [heading, setHeading] = useState('');
     const [content, setContent] = useState('');
@@ -43,7 +43,8 @@ function AddFeed({onFeedAdded}) {
             await axios.post("http://127.0.0.1:5000/addFeed", {
                 heading: heading,
                 content: content,
-                photo: photoBase64
+                photo: photoBase64,
+                groupCode: groupCode
             }, {
                 headers: {
                     Authorization: `Bearer ${token}`,

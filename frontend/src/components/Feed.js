@@ -3,10 +3,12 @@ import React, { useState, useEffect } from 'react'
 import AddFeed from './AddFeed';
 import Layout from './Layout';
 import { deletePost, getCurrentUser, isTokenExpired, showFeeds, updateFeed } from './Utils';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 function Feed() {
     const navigate = useNavigate();
+    const location = useLocation();
+    const { groupCode } = location.state || {};
     const [posts, setPosts] = useState([]);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
     const [comments, setComments] = useState({});
@@ -35,7 +37,10 @@ function Feed() {
                 }
                 setIsAuthorized(true);
                 const response = await axios.post('http://127.0.0.1:5000/getAllFeeds', 
-                    { page: currentPage },
+                    { 
+                        page: currentPage, 
+                        groupCode: groupCode
+                    },
                     {
                         headers: {
                             'Authorization': `Bearer ${token}`,
@@ -135,7 +140,7 @@ function Feed() {
         setRefreshTrigger(prev => prev+1);
     }
     const handleUserClick = (username) => {
-        navigate(`/profile/${username}`);
+        navigate(`/profile/${username}`, { state: { groupCode } });
     };
 
     const handleUpdatePost = async (postId) => {
@@ -173,7 +178,7 @@ function Feed() {
         <Layout>
             <div className="feed-container">
                 <div className="add-feed-section">
-                    <AddFeed onFeedAdded={handleFeedAdded} />
+                    <AddFeed onFeedAdded={handleFeedAdded} groupCode={groupCode}/>
                 </div>
                 {showFeeds(
                     posts,
@@ -200,7 +205,8 @@ function Feed() {
                     setEditContent,
                     handleUpdatePost,
                     handlePhotoChange,
-                    editPhotoPreview
+                    editPhotoPreview,
+                    groupCode
                 )}       
                             
                 </div>

@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { isTokenExpired, getUserProfile, showFeeds, deletePost, updateFeed } from './Utils';
 import Layout from './Layout';
 import '../css/Feed.css';
 
 function UserProfile() {
+    const location = useLocation();
+    const { groupCode } = location.state || {};
+    console.log(groupCode)
     const [user, setUser] = useState(null);
     const [error, setError] = useState(null);
     const [openComments, setOpenComments] = useState({});
@@ -23,7 +26,8 @@ function UserProfile() {
     useEffect(() => {
         const fetchUserProfile = async () => {
             try {
-                const userData = await getUserProfile(username);
+                console.log(groupCode)
+                const userData = await getUserProfile(username, groupCode);
                 setUser(userData.user);
             } catch (err) {
                 setError(err.message);
@@ -37,7 +41,7 @@ function UserProfile() {
     }, [username, refreshTrigger, navigate]);
 
     const handleUserClick = (createdBy) => {
-        navigate(`/profile/${createdBy}`);
+        navigate(`/profile/${createdBy}`, { state: { groupCode } });
     };
 
     const handleCommentChange = (postId, value) => {
@@ -169,7 +173,8 @@ function UserProfile() {
                             setEditContent,
                             handleUpdatePost,
                             handlePhotoChange,
-                            editPhotoPreview
+                            editPhotoPreview,
+                            groupCode
                         )
                     ) : (
                         <p className="alert alert-info">No feeds available.</p>

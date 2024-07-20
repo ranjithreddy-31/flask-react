@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { isTokenExpired } from './Utils';
 import '../css/FeedHome.css';
+import Layout from './Layout';
 
 function FeedHome() {
     const navigate = useNavigate();
@@ -68,6 +69,7 @@ function FeedHome() {
     }
 
     return (
+        <Layout>
         <div className="feed-home-container">
             <h1 className="feed-home-title">Feed Home</h1>
             <div className="feed-home-content">
@@ -123,6 +125,7 @@ function FeedHome() {
                 </div>
             </div>
         </div>
+        </Layout>
     )
 }
 

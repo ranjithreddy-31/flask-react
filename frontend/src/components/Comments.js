@@ -1,10 +1,10 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import "../css/Comment.css"
-function Comments({ comments }) {
+function Comments({ comments, groupCode }) {
   const navigate = useNavigate();
   const handleUserClick = (username) =>{
-    navigate(`/profile/${username}`);
+    navigate(`/profile/${username}`, { state: { groupCode } });
   }
   return (
     <div className="comments-container">

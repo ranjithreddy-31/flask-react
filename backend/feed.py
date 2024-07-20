@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request, current_app, send_from_directory
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from models import Feed, Comment, User, db
+from models import Feed, Comment, User, Group, db
 import os
 from werkzeug.utils import secure_filename
 import base64
@@ -14,13 +14,15 @@ def add_feed():
     heading = data.get('heading')
     content = data.get('content')
     photo_base64 = data.get('photo')
+    group_code = data.get('groupCode')
     user_id = get_jwt_identity()
 
     if not heading or not content:
         return jsonify({'message': 'Heading and content are required'}), 400
 
     try:
-        new_feed = Feed(heading=heading, content=content, created_by=user_id)
+        group = Group.query.filter_by(code=group_code).first()
+        new_feed = Feed(heading=heading, content=content, created_by=user_id, group_id=group.id)
 
         db.session.add(new_feed)
         db.session.flush()  # Ensure the feed ID is generated before committing
@@ -52,10 +54,22 @@ def add_feed():
 def get_all_feeds():
     data = request.get_json()
     page = data.get('page', 1)
-    per_page = 10**9
+    group_code = data.get('groupCode')
+    per_page = 10  # You can adjust this value as needed
+
+    if not group_code:
+        return jsonify({'message': 'Group code is required'}), 400
+
+    try:
+        # Get the group by code
+        group = Group.query.filter_by(code=group_code).first()
+        if not group:
+            return jsonify({'message': 'Group not found'}), 404
     
-    pagination = Feed.query.join(User).order_by(Feed.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
-    return jsonify_feeds(pagination)
+        pagination = Feed.query.filter_by(group_id=group.id).join(User).order_by(Feed.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
+        return jsonify_feeds(pagination)
+    except Exception as e:
+        return jsonify({'message': f'An error occurred: {str(e)}'}), 500
 
 @feed_bp.route("/deleteFeed", methods=["DELETE"])
 @jwt_required()
@@ -93,7 +107,6 @@ def update_feed(feedId):
 
     feed.heading = heading
     feed.content = content
-    print(request.files)
     if 'photo' in request.files:
         photo = request.files['photo']
         if photo:
@@ -116,12 +129,19 @@ def getUserData():
     data = request.get_json()
     try:
         user = User.query.filter_by(username=data["username"]).first()
+        group = Group.query.filter_by(code=data["groupCode"]).first() if "groupCode" in data else None
         if not user:
             return jsonify({'message': 'User not found'}), 404
-        
+        current_user = get_jwt_identity()
+        print(current_user, user.id)
         page = 1
         per_page = 10  # Adjust per_page to your needs
-        pagination = Feed.query.filter_by(created_by=user.id).paginate(page=page, per_page=per_page, error_out=False)
+        if group:
+            pagination = Feed.query.filter_by(created_by=user.id, group_id=group.id).paginate(page=page, per_page=per_page, error_out=False)
+        elif current_user == user.id:
+            pagination = Feed.query.filter_by(created_by=user.id).paginate(page=page, per_page=per_page, error_out=False)
+        else:
+            return jsonify({'message': 'Unauthorized access'}), 403
         
         # Get the feeds response using the jsonify_feeds function
         feeds_response = jsonify_feeds(pagination)
@@ -140,7 +160,8 @@ def getUserData():
             'user': user_data
         }), 200
     except Exception as e:
-        return jsonify({'message': f'Failed to fetch user data: {str(e)}'}), 500
+        print(e)
+        return jsonify({'message': f'Failed to fetch user data: {e}'}), 500
 
 def jsonify_feeds(pagination):
     all_feeds_list = []
