@@ -58,7 +58,8 @@ function FeedHome() {
             });
 
             if (response.status === 200) {
-                navigate(`/feed`, { state: { groupCode } });
+                localStorage.setItem('currentGroup', groupCode);
+                navigate('/feed');
             } else {
                 setError('Group not found.');
             }

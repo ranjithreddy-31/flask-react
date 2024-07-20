@@ -28,7 +28,6 @@ function Weather() {
                     }
                 );
                 const data = response.data.weather;
-                console.log(data);
                 setWeatherData(data);
                 setError(null);
             } catch (error) {

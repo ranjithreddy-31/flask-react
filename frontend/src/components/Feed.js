@@ -3,12 +3,10 @@ import React, { useState, useEffect } from 'react'
 import AddFeed from './AddFeed';
 import Layout from './Layout';
 import { deletePost, getCurrentUser, isTokenExpired, showFeeds, updateFeed } from './Utils';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 function Feed() {
     const navigate = useNavigate();
-    const location = useLocation();
-    const { groupCode } = location.state || {};
     const [posts, setPosts] = useState([]);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
     const [comments, setComments] = useState({});
@@ -23,7 +21,7 @@ function Feed() {
     const [editContent, setEditContent] = useState('');
     const [editPhoto, setEditPhoto] = useState(null);
     const [editPhotoPreview, setEditPhotoPreview] = useState(null);
-
+    const groupCode = localStorage.getItem("currentGroup");
 
 
 
@@ -63,7 +61,7 @@ function Feed() {
         };
         fetchPosts();
         fetchCurrentUser();
-    }, [refreshTrigger, currentPage, navigate]);
+    }, [refreshTrigger, currentPage, navigate, groupCode]);
 
     const handleFeedAdded = () => {
         setRefreshTrigger(prev => prev + 1);
@@ -140,7 +138,7 @@ function Feed() {
         setRefreshTrigger(prev => prev+1);
     }
     const handleUserClick = (username) => {
-        navigate(`/profile/${username}`, { state: { groupCode } });
+        navigate(`/profile/${username}`);
     };
 
     const handleUpdatePost = async (postId) => {

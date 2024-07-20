@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import "../css/Comment.css"
 function Comments({ comments, groupCode }) {
   const navigate = useNavigate();

@@ -32,7 +32,6 @@ export const getUserProfile = async(username, groupCode) => {
         if(isTokenExpired(token)) {
             throw new Error('Token expired');
         }
-        console.log(groupCode)
         const response = await axios.post('http://127.0.0.1:5000/getUserData', {
             username: username,
             groupCode: groupCode
@@ -149,7 +148,10 @@ export const showFeeds = (
                     </div>
                     {editingPost === post.id ? (
                         <div className="edit-post-container">
-                            <form className="edit-post-form">
+                            <form className="edit-post-form" onSubmit={(e) => {
+                                e.preventDefault();
+                                handleUpdatePost(post.id);
+                            }}>
                                 <input
                                     type="text"
                                     value={editHeading}
@@ -174,10 +176,10 @@ export const showFeeds = (
                                         <i className="fas fa-image"></i> Photo
                                     </label>
                                     <div className="buttons-group">
-                                        <button onClick={() => handleUpdatePost(post.id)} className="post-button action-button">
+                                        <button type="submit" className="post-button action-button">
                                             Update
                                         </button>
-                                        <button onClick={() => handleEditPost(null)} className="cancel-button action-button">
+                                        <button type="button" onClick={() => handleEditPost(null)} className="cancel-button action-button">
                                             Cancel
                                         </button>
                                     </div>
@@ -190,7 +192,7 @@ export const showFeeds = (
                                 )}
                             </form>
                         </div>
-                    )  : (
+                    ) : (
                         <>
                             <p className="post-content">{post.content}</p>
                             {post.picture && isAuthorized && (

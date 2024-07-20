@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import { isTokenExpired, getUserProfile, showFeeds, deletePost, updateFeed } from './Utils';
+import { isTokenExpired, getUserProfile, showFeeds, deletePost, updateFeed, getCurrentUser } from './Utils';
 import Layout from './Layout';
 import '../css/Feed.css';
 
 function UserProfile() {
-    const location = useLocation();
-    const { groupCode } = location.state || {};
-    console.log(groupCode)
     const [user, setUser] = useState(null);
     const [error, setError] = useState(null);
     const [openComments, setOpenComments] = useState({});
@@ -20,13 +17,14 @@ function UserProfile() {
     const [editContent, setEditContent] = useState('');
     const [editPhoto, setEditPhoto] = useState(null);
     const [editPhotoPreview, setEditPhotoPreview] = useState(null);
+    const [currentUser, setCurrentUser] = useState(null);
     const { username } = useParams();
     const navigate = useNavigate();
+    const groupCode = localStorage.getItem("currentGroup");
 
     useEffect(() => {
         const fetchUserProfile = async () => {
             try {
-                console.log(groupCode)
                 const userData = await getUserProfile(username, groupCode);
                 setUser(userData.user);
             } catch (err) {
@@ -36,12 +34,16 @@ function UserProfile() {
                 }
             }
         };
-
+        const fetchCurrentUser = async () => {
+            const user = await getCurrentUser();
+            setCurrentUser(user);
+        };
+        fetchCurrentUser();
         fetchUserProfile();
-    }, [username, refreshTrigger, navigate]);
+    }, [username, refreshTrigger, navigate, groupCode]);
 
     const handleUserClick = (createdBy) => {
-        navigate(`/profile/${createdBy}`, { state: { groupCode } });
+        navigate(`/profile/${createdBy}`);
     };
 
     const handleCommentChange = (postId, value) => {
@@ -163,7 +165,7 @@ function UserProfile() {
                             () => {}, // handleNextPage (not applicable for profile view)
                             handleEditPost,
                             handleDeletePost,
-                            username, // currentUser
+                            currentUser, // currentUser
                             openMenus,
                             setOpenMenus,
                             editingPost,

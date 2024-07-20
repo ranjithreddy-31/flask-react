@@ -34,7 +34,6 @@ def add_feed():
             
             filename = secure_filename(f"feed_photo_{new_feed.id}.jpg")
             filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
-            print(filepath)
             
             with open(filepath, 'wb') as f:
                 f.write(photo_binary)
