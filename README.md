@@ -1,6 +1,6 @@
 # Flask + React App
 
-This project is a full-stack application built with Flask (for the backend) and React (for the frontend). It includes several endpoints for managing different functionalities such as Todo List, Expression Calculator, and Web Scraper.
+This project is a full-stack application built with Flask (for the backend) and React (for the frontend). It includes several endpoints for managing different functionalities.
 
 ## Features
 - **Fee:**
