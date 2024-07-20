@@ -27,7 +27,7 @@ const Home = () => {
                     <button className="home-button" onClick={() => handleNavigation('todo_list')}>Todo List</button>
                     <button className="home-button" onClick={() => handleNavigation('calculator')}>Calculator</button>
                     <button className="home-button" onClick={() => handleNavigation('weather')}>Weather</button>
-                    <button className="home-button" onClick={() => handleNavigation('feed')}>Feed</button>
+                    <button className="home-button" onClick={() => handleNavigation('feedhome')}>Feed</button>
                 </div>
             </div>
         </Layout>

@@ -1,0 +1,117 @@
+/* FeedHome.css */
+
+.feed-home-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #f0f2f5;
+    font-family: 'Arial', sans-serif;
+    padding: 20px;
+}
+
+.feed-home-title {
+    color: #1877f2;
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+}
+
+.feed-home-content {
+    display: flex;
+    width: 100%;
+    max-width: 1200px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.feed-home-pane {
+    flex: 1;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.feed-home-pane:first-child {
+    border-right: 1px solid #dddfe2;
+}
+
+.feed-home-subtitle {
+    color: #1c1e21;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.feed-home-error {
+    text-align: center;
+    margin-bottom: 1rem;
+    color: #dc3545;
+}
+
+.feed-home-input-group {
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.feed-home-input-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #1c1e21;
+}
+
+.feed-home-input,
+.feed-home-textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #dddfe2;
+    border-radius: 6px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.feed-home-button {
+    width: 100%;
+    padding: 0.8rem;
+    background-color: #1877f2;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.feed-home-button:hover {
+    background-color: #166fe5;
+}
+
+.feed-home-message {
+    text-align: center;
+    margin-top: 1rem;
+    color: #65676b;
+}
+
+@media (max-width: 768px) {
+    .feed-home-content {
+        flex-direction: column;
+    }
+
+    .feed-home-pane:first-child {
+        border-right: none;
+        border-bottom: 1px solid #dddfe2;
+    }
+}
+
+@media (max-width: 480px) {
+    .feed-home-pane {
+        padding: 1.5rem;
+    }
+
+    .feed-home-title {
+        font-size: 2rem;
+    }
+}

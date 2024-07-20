@@ -10,6 +10,7 @@ import Calculator from './components/Calculator';
 import Weather from './components/Weather';
 import Feed from './components/Feed';
 import UserProfile from './components/UserProfile';
+import FeedHome from './components/FeedHome';
 
 const App = () => {
   return (
@@ -18,13 +19,14 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/home" element={<PrivateRoute><Home /></PrivateRoute>} />
-        <Route path="/" element={<PrivateRoute><Home /></PrivateRoute>} />
+        <Route path="/" element={<PrivateRoute><Login /></PrivateRoute>} />
         <Route path="/scrape_data" element={<PrivateRoute><ScrapeData /></PrivateRoute>} />
         <Route path="/todo_list" element={<PrivateRoute><TodoList /></PrivateRoute>} />
         <Route path="/calculator" element={<PrivateRoute><Calculator /></PrivateRoute>} />
         <Route path="/weather" element={<PrivateRoute><Weather /></PrivateRoute>} />
         <Route path="/feed" element={<PrivateRoute><Feed/></PrivateRoute>} />
         <Route path="/profile/:username" element={<PrivateRoute><UserProfile /></PrivateRoute>} />
+        <Route path="feedhome" element={<PrivateRoute><FeedHome /></PrivateRoute>} />
       </Routes>
     </Router>
   );
