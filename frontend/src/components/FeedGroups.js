@@ -12,8 +12,7 @@ function FeedGroups() {
     const [aboutGroup, setAboutGroup] = useState('');
     const [error, setError] = useState('');
     const [userGroups, setUserGroups] = useState([]);
-    const [showJoinForm, setShowJoinForm] = useState(false);
-    const [showCreateForm, setShowCreateForm] = useState(false);
+    const [activeForm, setActiveForm] = useState(null); // 'join', 'create', or null
 
     useEffect(() => {
         fetchUserGroups();
@@ -28,9 +27,7 @@ function FeedGroups() {
                 return;
             }
             const response = await axios.get(`http://127.0.0.1:5000/user/groups`, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
+                headers: { Authorization: `Bearer ${token}` }
             });
             setUserGroups(response.data.groups);
         } catch (error) {
@@ -48,16 +45,13 @@ function FeedGroups() {
                 navigate('/login');
                 return;
             }
-            const response = await axios.post("http://127.0.0.1:5000/createGroup", {
-                groupName,
-                aboutGroup
-            }, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
+            const response = await axios.post("http://127.0.0.1:5000/createGroup", 
+                { groupName, aboutGroup },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
             setNewGroupCode(response.data.newGroupCode);
-            fetchUserGroups();  // Refresh the user's groups after creating a new one
+            fetchUserGroups();
+            setActiveForm(null); // Close the form after successful creation
         } catch (error) {
             console.error(`Failed creating group with error:`, error);
             setError('Failed to create group. Please try again.');
@@ -70,25 +64,20 @@ function FeedGroups() {
             setError('Please enter a group code.');
             return;
         }
-
         try {
             const token = localStorage.getItem('token');
             if (isTokenExpired(token)) {
                 navigate('/login');
                 return;
             }
-            const response = await axios.post(`http://127.0.0.1:5000/joinGroup`, 
+            const response = await axios.post(`http://127.0.0.1:5000/joinGroup`,
                 { groupCode },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                }
+                { headers: { Authorization: `Bearer ${token}` } }
             );
-
             if (response.status === 200) {
                 localStorage.setItem('currentGroup', groupCode);
-                fetchUserGroups();  // Refresh the user's groups after joining a new one
+                fetchUserGroups();
+                setActiveForm(null); // Close the form after successful join
                 navigate(`/feed/${groupCode}`);
             }
         } catch (error) {
@@ -102,113 +91,86 @@ function FeedGroups() {
     };
 
     const toggleJoinForm = () => {
-        setShowJoinForm(!showJoinForm);
-        if (!showJoinForm) {
-            setShowCreateForm(false);
-        }
+        setActiveForm(activeForm === 'join' ? null : 'join');
     };
 
     const toggleCreateForm = () => {
-        setShowCreateForm(!showCreateForm);
-        if (!showCreateForm) {
-            setShowJoinForm(false);
-        }
+        setActiveForm(activeForm === 'create' ? null : 'create');
     };
 
     return (
-        <div>
-            <h1 className="feed-home-title">Groups</h1>
-        <div className="feed-home-container">
-            <div className="user-groups">
-                    <h2>Your Groups</h2>
-                    {userGroups.length > 0 ? (
-                        <ul className="group-list">
-                            {userGroups.map(group => (
-                                <li key={group.id} className="group-item">
-                                    <Link to={`/feed/${group.code}`} className="group-link">
-                                        <div className="group-avatar">{getGroupInitials(group.name)}</div>
-                                        <div className="group-info">
-                                            <h3>{group.name}</h3>
-                                            <p>{group.code}</p>
-                                        </div>
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-                    ) : (
-                        <p>You haven't joined any groups yet.</p>
-                    )}
-                </div>
+        <div className="feed-groups-container">
+            <h2 className="feed-groups-title">Your Groups</h2>
+            <div className="feed-groups-actions">
+                <button 
+                    onClick={toggleJoinForm} 
+                    className={`feed-groups-button ${activeForm === 'join' ? 'active' : ''}`}
+                >
+                    Join Group
+                </button>
+                <button 
+                    onClick={toggleCreateForm} 
+                    className={`feed-groups-button ${activeForm === 'create' ? 'active' : ''}`}
+                >
+                    Create Group
+                </button>
+            </div>
+            
+            {activeForm === 'join' && (
+                <form onSubmit={handleJoinGroup} className="feed-groups-form">
+                    <input 
+                        type="text" 
+                        placeholder="Enter group code"
+                        value={groupCode}
+                        onChange={(e) => setGroupCode(e.target.value)}
+                        className="feed-groups-input"
+                    />
+                    <button type="submit" className="feed-groups-submit">Join</button>
+                </form>
+            )}
 
-            <div className="feed-home-content">
-                <div className="feed-home-actions">
-                    <button className="feed-home-button" onClick={toggleJoinForm}>
-                        {showJoinForm ? 'Hide Join Form' : 'Join a Group'}
-                    </button>
-                    <button className="feed-home-button" onClick={toggleCreateForm}>
-                        {showCreateForm ? 'Hide Create Form' : 'Create a Group'}
-                    </button>
-                </div>
+            {activeForm === 'create' && (
+                <form onSubmit={handleCreateGroup} className="feed-groups-form">
+                    <input 
+                        type="text" 
+                        placeholder="Group name"
+                        value={groupName}
+                        onChange={(e) => setGroupName(e.target.value)}
+                        className="feed-groups-input"
+                    />
+                    <textarea 
+                        placeholder="About the group"
+                        value={aboutGroup}
+                        onChange={(e) => setAboutGroup(e.target.value)}
+                        className="feed-groups-textarea"
+                    ></textarea>
+                    <button type="submit" className="feed-groups-submit">Create</button>
+                </form>
+            )}
 
-                {error && <p className="feed-home-error">{error}</p>}
+            {error && <p className="feed-groups-error">{error}</p>}
+            
+            {newGroupCode && (
+                <p className="feed-groups-message">New group created! Group code: {newGroupCode}</p>
+            )}
 
-                {showJoinForm && (
-                    <div className="feed-home-form">
-                        <h2 className="feed-home-subtitle">Join a Group</h2>
-                        <form onSubmit={handleJoinGroup}>
-                            <div className="feed-home-input-group">
-                                <label htmlFor="groupCode">Group Code</label>
-                                <input 
-                                    id="groupCode"
-                                    type='text' 
-                                    value={groupCode} 
-                                    onChange={(e) => setGroupCode(e.target.value)} 
-                                    placeholder='Enter the Group Code'
-                                    className="feed-home-input"
-                                    required
-                                />
+            <div className="feed-groups-list">
+                {userGroups.length > 0 ? (
+                    userGroups.map((group) => (
+                        <Link to={`/feed/${group.code}`} key={group.code} className="feed-group-item">
+                            <div className="feed-group-avatar">{getGroupInitials(group.name)}</div>
+                            <div className="feed-group-info">
+                                <h3>{group.name}</h3>
+                                <p>{group.code}</p>
                             </div>
-                            <button type="submit" className="feed-home-button">Join</button>
-                        </form>
-                    </div>
-                )}
-
-                {showCreateForm && (
-                    <div className="feed-home-form">
-                        <h2 className="feed-home-subtitle">Create a Group</h2>
-                        <form onSubmit={handleCreateGroup}>
-                            <div className="feed-home-input-group">
-                                <label htmlFor="groupName">Group Name</label>
-                                <input 
-                                    id="groupName"
-                                    type='text' 
-                                    value={groupName} 
-                                    onChange={(e) => setGroupName(e.target.value)} 
-                                    placeholder='Enter the Group Name'
-                                    className="feed-home-input"
-                                    required
-                                />
-                            </div>
-                            <div className="feed-home-input-group">
-                                <label htmlFor="aboutGroup">About Group</label>
-                                <textarea 
-                                    id="aboutGroup"
-                                    value={aboutGroup} 
-                                    onChange={(e) => setAboutGroup(e.target.value)} 
-                                    placeholder='About this Group...'
-                                    className="feed-home-textarea"
-                                    required
-                                />
-                            </div>
-                            <button type="submit" className="feed-home-button">Create</button>
-                            {newGroupCode && <p className="feed-home-message">Your Group Code is: <strong>{newGroupCode}</strong></p>}
-                        </form>
-                    </div>
+                        </Link>
+                    ))
+                ) : (
+                    <p className="feed-groups-empty">You haven't joined any groups yet.</p>
                 )}
             </div>
         </div>
-        </div>
-    )
+    );
 }
 
 export default FeedGroups;
