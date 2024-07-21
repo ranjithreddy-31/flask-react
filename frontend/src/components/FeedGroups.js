@@ -16,7 +16,7 @@ function FeedGroups() {
 
     useEffect(() => {
         fetchUserGroups();
-    }, []);
+    });
 
     const fetchUserGroups = async () => {
         setError('');
