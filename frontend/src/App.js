@@ -10,7 +10,8 @@ import Calculator from './components/Calculator';
 import Weather from './components/Weather';
 import Feed from './components/Feed';
 import UserProfile from './components/UserProfile';
-import FeedHome from './components/FeedHome';
+import FeedGroups from './components/FeedGroups';
+import FeedMainLayout from './components/FeedMainLayout';
 
 const App = () => {
   return (
@@ -24,9 +25,11 @@ const App = () => {
         <Route path="/todo_list" element={<PrivateRoute><TodoList /></PrivateRoute>} />
         <Route path="/calculator" element={<PrivateRoute><Calculator /></PrivateRoute>} />
         <Route path="/weather" element={<PrivateRoute><Weather /></PrivateRoute>} />
-        <Route path="/feed" element={<PrivateRoute><Feed/></PrivateRoute>} />
         <Route path="/profile/:username" element={<PrivateRoute><UserProfile /></PrivateRoute>} />
-        <Route path="feedhome" element={<PrivateRoute><FeedHome /></PrivateRoute>} />
+        <Route path="/feedgroups" element={<PrivateRoute><FeedGroups /></PrivateRoute>} />
+        <Route path="/feed" element={<PrivateRoute><FeedMainLayout /></PrivateRoute>}>
+          <Route path=":groupCode" element={<Feed />} />
+        </Route>
       </Routes>
     </Router>
   );

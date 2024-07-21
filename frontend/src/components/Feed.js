@@ -1,12 +1,12 @@
 import axios from 'axios';
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react';
 import AddFeed from './AddFeed';
-import Layout from './Layout';
 import { deletePost, getCurrentUser, isTokenExpired, showFeeds, updateFeed } from './Utils';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 function Feed() {
     const navigate = useNavigate();
+    const { groupCode } = useParams();
     const [posts, setPosts] = useState([]);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
     const [comments, setComments] = useState({});
@@ -21,15 +21,12 @@ function Feed() {
     const [editContent, setEditContent] = useState('');
     const [editPhoto, setEditPhoto] = useState(null);
     const [editPhotoPreview, setEditPhotoPreview] = useState(null);
-    const groupCode = localStorage.getItem("currentGroup");
-
-
 
     useEffect(() => {
         const fetchPosts = async () => {
             try {
                 const token = localStorage.getItem('token');
-                if(isTokenExpired(token)) {
+                if (isTokenExpired(token)) {
                     navigate('/login');
                     return;
                 }
@@ -74,7 +71,7 @@ function Feed() {
     const handleAddComment = async (feedId) => {
         try {
             const token = localStorage.getItem('token');
-            if(isTokenExpired(token)) {
+            if (isTokenExpired(token)) {
                 navigate('/login');
                 return;
             }
@@ -126,8 +123,6 @@ function Feed() {
         }
     };
     
-    
-
     const handleDeletePost = async(postId) =>{
         const token = localStorage.getItem('token');
         if(isTokenExpired(token)){
@@ -171,9 +166,7 @@ function Feed() {
         }
     };
     
-
     return (
-        <Layout>
             <div className="feed-container">
                 <div className="add-feed-section">
                     <AddFeed onFeedAdded={handleFeedAdded} groupCode={groupCode}/>
@@ -206,9 +199,7 @@ function Feed() {
                     editPhotoPreview,
                     groupCode
                 )}       
-                            
-                </div>
-        </Layout>
+            </div>
     )
 }
 

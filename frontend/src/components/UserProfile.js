@@ -140,14 +140,13 @@ function UserProfile() {
 
     return (
         <Layout>
-            <div className="user-profile">
+            <div className="feed-container">
                 <div className="profile-header">
                     <h1>{username}'s Profile</h1>
                     <p>User ID: {user.id}</p>
                     <p>Email: {user.email}</p>
                 </div>
-
-                <div className="feeds-section">
+                <div className="feed-container">
                     <h2>Feeds</h2>
                     {user.feeds && user.feeds.length > 0 ? (
                         showFeeds(

@@ -1,0 +1,36 @@
+.main-layout {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.pane {
+    height: 100%;
+    overflow-y: auto;
+}
+
+.left-pane, .right-pane {
+    min-width: 10%;
+    max-width: 40%;
+}
+
+.center-pane {
+    flex-grow: 1;
+    min-width: 20%;
+}
+
+.divider {
+    width: 4px;
+    background-color: #ccc;
+    cursor: col-resize;
+    transition: background-color 0.3s ease;
+}
+
+.divider:hover {
+    background-color: #999;
+}
+
+/* Ensure content doesn't overlap with dividers */
+.pane > * {
+    padding: 10px;
+}

@@ -1,6 +1,19 @@
 /* Common.css */
 
 /* Color Variables */
+/* Add these at the top of your Common.css file */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+#root {
+    height: 100%;
+    overflow: hidden;
+}
+
 :root {
     --primary-color: #007bff;
     --secondary-color: #6c757d;
