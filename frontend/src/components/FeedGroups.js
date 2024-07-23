@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { isTokenExpired } from './Utils';
@@ -14,11 +14,7 @@ function FeedGroups() {
     const [userGroups, setUserGroups] = useState([]);
     const [activeForm, setActiveForm] = useState(null); // 'join', 'create', or null
 
-    useEffect(() => {
-        fetchUserGroups();
-    });
-
-    const fetchUserGroups = async () => {
+    const fetchUserGroups = useCallback(async () => {
         setError('');
         try {
             const token = localStorage.getItem('token');
@@ -34,7 +30,11 @@ function FeedGroups() {
             console.error(`Failed fetching user groups with error:`, error);
             setError('Failed to fetch user groups. Please try again.');
         }
-    };
+    }, [navigate]); // Include navigate in the dependency array
+
+    useEffect(() => {
+        fetchUserGroups();
+    }, [fetchUserGroups]);
 
     const handleCreateGroup = async (e) => {
         e.preventDefault();

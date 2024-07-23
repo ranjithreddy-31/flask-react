@@ -1,8 +1,8 @@
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import axios from 'axios';
-import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import AddFeed from './AddFeed';
 import { deletePost, getCurrentUser, isTokenExpired, showFeeds, updateFeed } from './Utils';
-import { useNavigate, useParams } from 'react-router-dom';
 
 function Feed() {
     const navigate = useNavigate();
@@ -21,44 +21,57 @@ function Feed() {
     const [editContent, setEditContent] = useState('');
     const [editPhoto, setEditPhoto] = useState(null);
     const [editPhotoPreview, setEditPhotoPreview] = useState(null);
+    const intervalRef = useRef(null);
+
+    const fetchPosts = useCallback(async () => {
+        try {
+            const token = localStorage.getItem('token');
+            if (isTokenExpired(token)) {
+                navigate('/login');
+                return;
+            }
+            setIsAuthorized(true);
+            const response = await axios.get('http://127.0.0.1:5000/getAllFeeds', {
+                params: {
+                    page: currentPage,
+                    groupCode: groupCode
+                },
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            setPosts(response.data.feeds);
+            setTotalPages(response.data.pages);
+        } catch (error) {
+            console.error('Error fetching posts:', error);
+            if (error.response && error.response.status === 401) {
+                navigate('/login');
+            }
+        }
+    }, [currentPage, groupCode, navigate]);
 
     useEffect(() => {
-        const fetchPosts = async () => {
-            try {
-                const token = localStorage.getItem('token');
-                if (isTokenExpired(token)) {
-                    navigate('/login');
-                    return;
-                }
-                setIsAuthorized(true);
-                const response = await axios.post('http://127.0.0.1:5000/getAllFeeds', 
-                    { 
-                        page: currentPage, 
-                        groupCode: groupCode
-                    },
-                    {
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        }
-                    }
-                );
-                setPosts(response.data.feeds);
-                setTotalPages(response.data.pages);
-            } catch (error) {
-                console.error('Error fetching posts:', error);
-                if (error.response && error.response.status === 401) {
-                    navigate('/login');
-                }
-            }
-        };
+        fetchPosts();
+        
         const fetchCurrentUser = async () => {
             const user = await getCurrentUser();
             setCurrentUser(user);
         };
-        fetchPosts();
         fetchCurrentUser();
-    }, [refreshTrigger, currentPage, navigate, groupCode]);
+
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+        }
+
+        intervalRef.current = setInterval(fetchPosts, 5000); // Fetch every minute instead of every 5 seconds
+
+        return () => {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+            }
+        };
+    }, [fetchPosts, refreshTrigger]);
 
     const handleFeedAdded = () => {
         setRefreshTrigger(prev => prev + 1);
@@ -117,21 +130,21 @@ function Feed() {
         const file = event.target.files[0];
         if (file) {
             setEditPhoto(file);
-            // Create a preview URL for the selected image
             const previewURL = URL.createObjectURL(file);
             setEditPhotoPreview(previewURL);
         }
     };
     
-    const handleDeletePost = async(postId) =>{
+    const handleDeletePost = async(postId) => {
         const token = localStorage.getItem('token');
         if(isTokenExpired(token)){
             navigate('/');
         }
         await deletePost(postId, token);
         console.log("deleted the post");
-        setRefreshTrigger(prev => prev+1);
-    }
+        setRefreshTrigger(prev => prev + 1);
+    };
+
     const handleUserClick = (username) => {
         navigate(`/profile/${username}`);
     };
@@ -167,40 +180,40 @@ function Feed() {
     };
     
     return (
-            <div className="feed-container">
-                <div className="add-feed-section">
-                    <AddFeed onFeedAdded={handleFeedAdded} groupCode={groupCode}/>
-                </div>
-                {showFeeds(
-                    posts,
-                    isAuthorized,
-                    openComments,
-                    setOpenComments,
-                    comments,
-                    handleCommentChange,
-                    handleAddComment,
-                    handleUserClick,
-                    currentPage,
-                    totalPages,
-                    handlePrevPage,
-                    handleNextPage,
-                    handleEditPost,
-                    handleDeletePost,
-                    currentUser,
-                    openMenus,
-                    setOpenMenus,
-                    editingPost,
-                    editHeading,
-                    setEditHeading,
-                    editContent,
-                    setEditContent,
-                    handleUpdatePost,
-                    handlePhotoChange,
-                    editPhotoPreview,
-                    groupCode
-                )}       
+        <div className="feed-container">
+            <div className="add-feed-section">
+                <AddFeed onFeedAdded={handleFeedAdded} groupCode={groupCode}/>
             </div>
-    )
+            {showFeeds(
+                posts,
+                isAuthorized,
+                openComments,
+                setOpenComments,
+                comments,
+                handleCommentChange,
+                handleAddComment,
+                handleUserClick,
+                currentPage,
+                totalPages,
+                handlePrevPage,
+                handleNextPage,
+                handleEditPost,
+                handleDeletePost,
+                currentUser,
+                openMenus,
+                setOpenMenus,
+                editingPost,
+                editHeading,
+                setEditHeading,
+                editContent,
+                setEditContent,
+                handleUpdatePost,
+                handlePhotoChange,
+                editPhotoPreview,
+                groupCode
+            )}       
+        </div>
+    );
 }
 
 export default Feed;

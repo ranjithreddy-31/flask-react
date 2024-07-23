@@ -2,6 +2,7 @@ import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
 import React from 'react';
 import Comments from './Comments';
+import '../css/Feed.css'
 
 
 export const isTokenExpired = () => {
@@ -26,22 +27,23 @@ export const isTokenExpired = () => {
     return true;
 };
 
-export const getUserProfile = async(username, groupCode) => {
+export const getUserProfile = async (username, groupCode) => {
     try {
         const token = localStorage.getItem('token');
-        if(isTokenExpired(token)) {
+        if (isTokenExpired(token)) {
             throw new Error('Token expired');
         }
-        const response = await axios.post('http://127.0.0.1:5000/getUserData', {
-            username: username,
-            groupCode: groupCode
-        }, {
+        const response = await axios.get('http://127.0.0.1:5000/getUserData', {
+            params: {
+                username: username,
+                groupCode: groupCode
+            },
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             }
         });
-       return response.data;
+        return response.data;
     } catch (error) {
         console.error('Error fetching user profile:', error);
         throw error;
