@@ -45,15 +45,13 @@ def add_feed():
         return jsonify({'message': 'Feed added successfully', 'feed_id': new_feed.id}), 201
     except Exception as e:
         db.session.rollback()
-        print(f"Error adding feed: {str(e)}")
-        return jsonify({'message': 'Failed to add the feed'}), 500
+        return jsonify({'message': f'Failed to add the feed due to error : {e}'}), 500
         
-@feed_bp.route("/getAllFeeds", methods=["POST"])
+@feed_bp.route("/getAllFeeds", methods=["GET"])
 @jwt_required()
 def get_all_feeds():
-    data = request.get_json()
-    page = data.get('page', 1)
-    group_code = data.get('groupCode')
+    page = request.args.get('page', default=1, type=int)
+    group_code = request.args.get('groupCode')
     per_page = 10  # You can adjust this value as needed
 
     if not group_code:
@@ -122,31 +120,30 @@ def update_feed(feedId):
 def uploaded_file(filename):
     return send_from_directory(current_app.config['UPLOAD_FOLDER'], filename)
 
-@feed_bp.route("/getUserData", methods=["POST"])
+@feed_bp.route("/getUserData", methods=["GET"])
 @jwt_required()
 def getUserData():
-    data = request.get_json()
+    username = request.args.get('username')
+    group_code = request.args.get('groupCode')
+    
     try:
-        user = User.query.filter_by(username=data["username"]).first()
-        group = Group.query.filter_by(code=data["groupCode"]).first() if "groupCode" in data else None
+        user = User.query.filter_by(username=username).first()
+        group = Group.query.filter_by(code=group_code).first() if group_code else None
         if not user:
             return jsonify({'message': 'User not found'}), 404
         current_user = get_jwt_identity()
-        print(current_user, user.id)
         page = 1
         per_page = 10  # Adjust per_page to your needs
-        if group:
-            pagination = Feed.query.filter_by(created_by=user.id, group_id=group.id).paginate(page=page, per_page=per_page, error_out=False)
-        elif current_user == user.id:
+        if current_user == user.id:
             pagination = Feed.query.filter_by(created_by=user.id).paginate(page=page, per_page=per_page, error_out=False)
+        elif group:
+            pagination = Feed.query.filter_by(created_by=user.id, group_id=group.id).paginate(page=page, per_page=per_page, error_out=False)
         else:
             return jsonify({'message': 'Unauthorized access'}), 403
         
-        # Get the feeds response using the jsonify_feeds function
         feeds_response = jsonify_feeds(pagination)
         feeds_data = feeds_response.get_json()
         
-        # Construct the user data including ID, username, and email
         user_data = {
             'id': user.id,
             'username': user.username,
@@ -159,7 +156,6 @@ def getUserData():
             'user': user_data
         }), 200
     except Exception as e:
-        print(e)
         return jsonify({'message': f'Failed to fetch user data: {e}'}), 500
 
 def jsonify_feeds(pagination):
