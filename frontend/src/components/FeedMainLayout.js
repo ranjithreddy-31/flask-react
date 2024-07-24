@@ -5,31 +5,26 @@ import '../css/FeedMainLayout.css';
 import Layout from './Layout';
 
 function FeedMainLayout() {
-    const [leftWidth, setLeftWidth] = useState(20); // Initial width in percentage
-    const [rightWidth, setRightWidth] = useState(20);
+    const [leftWidth, setLeftWidth] = useState(20);
     const leftPaneRef = useRef(null);
-    const rightPaneRef = useRef(null);
 
-    const handleMouseDown = useCallback((e, resizeFunc) => {
+    const handleMouseDown = useCallback((e) => {
         e.preventDefault();
-        document.addEventListener('mousemove', resizeFunc);
-        document.addEventListener('mouseup', () => {
-            document.removeEventListener('mousemove', resizeFunc);
-        });
-    }, []);
+        const startX = e.pageX;
+        const startWidth = leftPaneRef.current.getBoundingClientRect().width;
 
-    const resizeLeft = useCallback((e) => {
-        if (leftPaneRef.current) {
-            const newWidth = (e.clientX / window.innerWidth) * 100;
+        const handleMouseMove = (moveEvent) => {
+            const newWidth = ((startWidth + moveEvent.pageX - startX) / window.innerWidth) * 100;
             setLeftWidth(Math.min(Math.max(newWidth, 10), 40)); // Min 10%, Max 40%
-        }
-    }, []);
+        };
 
-    const resizeRight = useCallback((e) => {
-        if (rightPaneRef.current) {
-            const newWidth = ((window.innerWidth - e.clientX) / window.innerWidth) * 100;
-            setRightWidth(Math.min(Math.max(newWidth, 10), 40)); // Min 10%, Max 40%
-        }
+        const handleMouseUp = () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        };
+
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
     }, []);
 
     return (
@@ -44,21 +39,10 @@ function FeedMainLayout() {
                 </div>
                 <div 
                     className="divider"
-                    onMouseDown={(e) => handleMouseDown(e, resizeLeft)}
+                    onMouseDown={handleMouseDown}
                 />
-                <div className="pane center-pane">
+                <div className="pane right-pane">
                     <Outlet />
-                </div>
-                <div 
-                    className="divider"
-                    onMouseDown={(e) => handleMouseDown(e, resizeRight)}
-                />
-                <div 
-                    className="pane right-pane" 
-                    ref={rightPaneRef}
-                    style={{ width: `${rightWidth}%` }}
-                >
-                    {/* Placeholder for future group chat implementation */}
                 </div>
             </div>
         </Layout>

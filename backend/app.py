@@ -6,14 +6,14 @@ from models import db
 from constants import SQLALCHEMY_DATABASE_URI, SECRET_KEY, JWT_SECRET_KEY, UPLOAD_FOLDER
 from blacklist import blacklist
 import nltk
-import os
+from chat import init_socketio, socketio
 
 # Initialize the punkt tokenizer data
 nltk.download('punkt')
 
 def create_app():
     app = Flask(__name__)
-    CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}}, supports_credentials=True)
+    CORS(app, resources={r"/*": {"origins": ["http://localhost:3000", "http://127.0.0.1:3000"]}}, supports_credentials=True)
 
     app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
     app.config['SECRET_KEY'] = SECRET_KEY
@@ -40,6 +40,7 @@ def create_app():
     return app
 
 app = create_app()
+init_socketio(app)
 jwt = JWTManager(app)
 
 # Register Blueprints
@@ -97,4 +98,4 @@ def missing_token_callback(error):
     )
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    socketio.run(app, debug=True, host='0.0.0.0', port=5000, log_output=True)

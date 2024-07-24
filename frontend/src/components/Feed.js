@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import AddFeed from './AddFeed';
 import { deletePost, getCurrentUser, isTokenExpired, showFeeds, updateFeed } from './Utils';
+import Chat from './Chat';
+import '../css/Feed.css'; // Assuming you have a CSS file for Feed component
 
 function Feed() {
     const navigate = useNavigate();
@@ -49,15 +51,11 @@ function Feed() {
             console.error('Error fetching posts:', error);
             if (error.response && error.response.status === 401) {
                 navigate('/login');
-            }
-            else{
-            if (error.response && error.response.status === 403)
-                {
-                    setError(`Error adding comment: You are currently not part of this group}`);
-                }
-            else
-                {
-                    setError(`Error adding comment: ${error}`);
+            } else {
+                if (error.response && error.response.status === 403) {
+                    setError(`Error fetching posts: You are currently not part of this group`);
+                } else {
+                    setError(`Error fetching posts: ${error}`);
                 }
             }
         }
@@ -65,7 +63,6 @@ function Feed() {
 
     useEffect(() => {
         fetchPosts();
-        
         const fetchCurrentUser = async () => {
             const user = await getCurrentUser();
             setCurrentUser(user);
@@ -76,7 +73,7 @@ function Feed() {
             clearInterval(intervalRef.current);
         }
 
-        intervalRef.current = setInterval(fetchPosts, 5000); // Fetch every minute instead of every 5 seconds
+        intervalRef.current = setInterval(fetchPosts, 5000); // Fetch every 5 seconds
 
         return () => {
             if (intervalRef.current) {
@@ -116,15 +113,8 @@ function Feed() {
             console.error('Error adding comment:', error);
             if (error.response && error.response.status === 401) {
                 navigate('/login');
-            }
-            else{
-                if (error.response && error.response.status === 403)
-                {
-                    setError(`Error adding comment: You are currently not part of this group`);
-                }
-                {
-                    setError(`Error adding comment: ${error}`);
-                }
+            } else {
+                setError(`Error adding comment: ${error}`);
             }
         }
     };
@@ -156,11 +146,11 @@ function Feed() {
             setEditPhotoPreview(previewURL);
         }
     };
-    
+
     const handleDeletePost = async(postId) => {
         try {
             const token = localStorage.getItem('token');
-            if(isTokenExpired(token)){
+            if (isTokenExpired(token)) {
                 navigate('/');
                 return;
             }
@@ -181,7 +171,7 @@ function Feed() {
     const handleUpdatePost = async (postId) => {
         try {
             const token = localStorage.getItem('token');
-            if(isTokenExpired(token)) {
+            if (isTokenExpired(token)) {
                 navigate('/login');
                 return;
             }
@@ -207,41 +197,47 @@ function Feed() {
             }
         }
     };
-    
+
     return (
-        <div className="feed-container">
-            {error && <div className="error-message">{error}</div>}
-            <div className="add-feed-section">
-                <AddFeed onFeedAdded={handleFeedAdded} groupCode={groupCode}/>
+        <div className="feed-and-chat-container">
+            {error && <h1>{error}</h1>}
+            <div className="feed-section">
+                <div className="feed-container">
+                    {/* {error && <h1>{error}</h1>} */}
+                    <AddFeed onFeedAdded={handleFeedAdded} groupCode={groupCode} />
+                    {showFeeds(
+                        posts,
+                        isAuthorized,
+                        openComments,
+                        setOpenComments,
+                        comments,
+                        handleCommentChange,
+                        handleAddComment,
+                        handleUserClick,
+                        currentPage,
+                        totalPages,
+                        handlePrevPage,
+                        handleNextPage,
+                        handleEditPost,
+                        handleDeletePost,
+                        currentUser,
+                        openMenus,
+                        setOpenMenus,
+                        editingPost,
+                        editHeading,
+                        setEditHeading,
+                        editContent,
+                        setEditContent,
+                        handleUpdatePost,
+                        handlePhotoChange,
+                        editPhotoPreview,
+                        groupCode
+                    )}
+                </div>
             </div>
-            {showFeeds(
-                posts,
-                isAuthorized,
-                openComments,
-                setOpenComments,
-                comments,
-                handleCommentChange,
-                handleAddComment,
-                handleUserClick,
-                currentPage,
-                totalPages,
-                handlePrevPage,
-                handleNextPage,
-                handleEditPost,
-                handleDeletePost,
-                currentUser,
-                openMenus,
-                setOpenMenus,
-                editingPost,
-                editHeading,
-                setEditHeading,
-                editContent,
-                setEditContent,
-                handleUpdatePost,
-                handlePhotoChange,
-                editPhotoPreview,
-                groupCode
-            )}       
+            <div className="chat-section">
+                <Chat groupCode={groupCode} />
+            </div>
         </div>
     );
 }

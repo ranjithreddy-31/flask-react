@@ -250,3 +250,22 @@ body, html {
     opacity: 0.5;
     cursor: not-allowed;
 }
+
+/* Feed.css */
+.feed-and-chat-container {
+    display: flex;
+    height: 100%;
+}
+
+.feed-section {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    border-right: 1px solid #ccc;
+}
+
+.chat-section {
+    width: 300px;
+    overflow-y: auto;
+    padding: 10px;
+}
