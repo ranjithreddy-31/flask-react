@@ -8,6 +8,9 @@ This project is a full-stack application built with Flask (for the backend) and 
   - Update [07/15/2024]
     - Users can add photos in their posts and can view profiles
     - Users should be able to delete their posts now
+  - Update [07/23/2024]
+    - Users can now join groups and see posts specific groups
+    - Feed now supports basic chat functionality
     
 - **Todo List:**
   - Allows users to add, delete, and mark tasks as completed.
