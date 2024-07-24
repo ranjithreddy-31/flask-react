@@ -54,6 +54,8 @@ def get_all_feeds():
     group_code = request.args.get('groupCode')
     per_page = 10  # You can adjust this value as needed
 
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
     if not group_code:
         return jsonify({'message': 'Group code is required'}), 400
 
@@ -62,7 +64,10 @@ def get_all_feeds():
         group = Group.query.filter_by(code=group_code).first()
         if not group:
             return jsonify({'message': 'Group not found'}), 404
-    
+        
+        if user not in group.members:
+            return jsonify({'message': 'You are not a member of this group'}), 403
+
         pagination = Feed.query.filter_by(group_id=group.id).join(User).order_by(Feed.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
         return jsonify_feeds(pagination)
     except Exception as e:

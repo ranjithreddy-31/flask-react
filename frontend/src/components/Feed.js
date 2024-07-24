@@ -21,6 +21,7 @@ function Feed() {
     const [editContent, setEditContent] = useState('');
     const [editPhoto, setEditPhoto] = useState(null);
     const [editPhotoPreview, setEditPhotoPreview] = useState(null);
+    const [error, setError] = useState(null);
     const intervalRef = useRef(null);
 
     const fetchPosts = useCallback(async () => {
@@ -43,10 +44,21 @@ function Feed() {
             });
             setPosts(response.data.feeds);
             setTotalPages(response.data.pages);
+            setError(null);
         } catch (error) {
             console.error('Error fetching posts:', error);
             if (error.response && error.response.status === 401) {
                 navigate('/login');
+            }
+            else{
+            if (error.response && error.response.status === 403)
+                {
+                    setError(`Error adding comment: You are currently not part of this group}`);
+                }
+            else
+                {
+                    setError(`Error adding comment: ${error}`);
+                }
             }
         }
     }, [currentPage, groupCode, navigate]);
@@ -99,10 +111,20 @@ function Feed() {
             });
             setComments(prev => ({...prev, [feedId]: ''}));
             setRefreshTrigger(prev => prev + 1);
+            setError(null);
         } catch (error) {
             console.error('Error adding comment:', error);
             if (error.response && error.response.status === 401) {
                 navigate('/login');
+            }
+            else{
+                if (error.response && error.response.status === 403)
+                {
+                    setError(`Error adding comment: You are currently not part of this group`);
+                }
+                {
+                    setError(`Error adding comment: ${error}`);
+                }
             }
         }
     };
@@ -136,13 +158,20 @@ function Feed() {
     };
     
     const handleDeletePost = async(postId) => {
-        const token = localStorage.getItem('token');
-        if(isTokenExpired(token)){
-            navigate('/');
+        try {
+            const token = localStorage.getItem('token');
+            if(isTokenExpired(token)){
+                navigate('/');
+                return;
+            }
+            await deletePost(postId, token);
+            console.log("deleted the post");
+            setRefreshTrigger(prev => prev + 1);
+            setError(null); // Clear any previous errors
+        } catch (error) {
+            console.error('Error deleting post:', error);
+            setError('Failed to delete post. Please try again.');
         }
-        await deletePost(postId, token);
-        console.log("deleted the post");
-        setRefreshTrigger(prev => prev + 1);
     };
 
     const handleUserClick = (username) => {
@@ -181,6 +210,7 @@ function Feed() {
     
     return (
         <div className="feed-container">
+            {error && <div className="error-message">{error}</div>}
             <div className="add-feed-section">
                 <AddFeed onFeedAdded={handleFeedAdded} groupCode={groupCode}/>
             </div>

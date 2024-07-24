@@ -23,7 +23,7 @@ def scrape_data(url):
         paragraphs = soup.find_all('p')
         data = [paragraph.text for paragraph in paragraphs]
         full_text = ' '.join(data)
-        return jsonify({'summary': summary}), 200
+        return jsonify({'summary': full_text}), 200
     else:
         return jsonify({'message': 'Failed to retrieve data'}), 404
 
