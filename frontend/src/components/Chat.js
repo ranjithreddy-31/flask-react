@@ -1,26 +1,53 @@
 import React, { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
 import io from 'socket.io-client';
-import '../css/Chat.css'; // Ensure this CSS file exists
-import { getCurrentUser } from './Utils';
+import { isTokenExpired } from './Utils';
+import '../css/Chat.css';
 
-const Chat = ({ groupCode }) => {
-    const [message, setMessage] = useState('');
-    const [chat, setChat] = useState([]);
+function Chat({ groupCode }) {
+    const [messages, setMessages] = useState([]);
+    const [newMessage, setNewMessage] = useState('');
+    const [error, setError] = useState(null);
     const socketRef = useRef();
     const chatContainerRef = useRef();
-    const [currentUser, setCurrentUser] = useState('');
 
     useEffect(() => {
-        const fetchUser = async () => {
-            const user = await getCurrentUser();
-            setCurrentUser(user || 'Anonymous');
+        const token = localStorage.getItem('token');
+        if (isTokenExpired(token)) {
+            setError('Session expired. Please log in again.');
+            return;
+        }
+
+        const fetchMessages = async () => {
+            try {
+                const response = await axios.get(`http://127.0.0.1:5000/group/${groupCode}/messages`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setMessages(response.data.messages);
+                setError(null);
+            } catch (error) {
+                console.error('Error fetching messages:', error);
+                setError('Failed to fetch messages. Please try again.');
+            }
         };
-        fetchUser();
+
+        fetchMessages();
+
         socketRef.current = io('http://127.0.0.1:5000');
         socketRef.current.emit('join', { groupCode });
 
-        socketRef.current.on('message', (msg) => {
-            setChat((prevChat) => [...prevChat, msg]);
+        socketRef.current.on('connect', () => {
+            console.log('Socket connected');
+            socketRef.current.emit('join', { groupCode });
+        });
+
+        socketRef.current.on('connect_error', (error) => {
+            console.error('Socket connection error:', error);
+            setError('Failed to connect to chat server. Please try again.');
+        });
+
+        socketRef.current.on('message', (message) => {
+            setMessages((prevMessages) => [...prevMessages, message]);
         });
 
         return () => {
@@ -30,15 +57,26 @@ const Chat = ({ groupCode }) => {
         };
     }, [groupCode]);
 
-    useEffect(() => {
-        // Scroll to bottom of chat container when new messages arrive
-        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-    }, [chat]);
 
-    const sendChat = () => {
-        if (message.trim() && socketRef.current) {
-            socketRef.current.emit('message', { groupCode, text: message });
-            setMessage('');
+    const sendChat = async (e) => {
+        e.preventDefault();
+        if (newMessage.trim()) {
+            try {
+                const token = localStorage.getItem('token');
+                if (isTokenExpired(token)) {
+                    setError('Session expired. Please log in again.');
+                    return;
+                }
+                await axios.post(`http://127.0.0.1:5000/group/${groupCode}/messages`, 
+                    { content: newMessage },
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+                setNewMessage('');
+                setError(null);
+            } catch (error) {
+                console.error('Error sending message:', error);
+                setError('Failed to send message. Please try again.');
+            }
         }
     };
 
@@ -47,27 +85,27 @@ const Chat = ({ groupCode }) => {
             <div className="chat-header">
                 <h2>Group Chat</h2>
             </div>
+            {error && <p className="error-message">{error}</p>}
             <div className="chat-messages" ref={chatContainerRef}>
-                {chat.map((msg, index) => (
+                {messages.map((msg, index) => (
                     <div key={index} className="chat-message">
-                        <p className="chat-message-text">{msg.text}</p>
-                        <span className="chat-message-time">{currentUser}</span>
+                        <strong>{msg.user}</strong>: {msg.text}
+                        <span className="chat-message-time">{new Date(msg.timestamp).toLocaleString()}</span>
                     </div>
                 ))}
             </div>
-            <div className="chat-input-container">
+            <form onSubmit={sendChat} className="chat-input-container">
                 <input
                     type="text"
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
                     placeholder="Type a message..."
-                    onKeyPress={(e) => e.key === 'Enter' && sendChat()}
                     className="chat-input"
                 />
-                <button onClick={sendChat} className="chat-send-button">Send</button>
-            </div>
+                <button type="submit" className="chat-send-button">Send</button>
+            </form>
         </div>
     );
-};
+}
 
 export default Chat;
