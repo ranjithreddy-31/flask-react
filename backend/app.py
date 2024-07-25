@@ -52,6 +52,7 @@ from scraper import scraper_bp
 from weather import weather_bp
 from calculator import calculator_bp
 from group import group_bp
+from chat import chat_bp
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(feed_bp)
@@ -61,6 +62,7 @@ app.register_blueprint(scraper_bp)
 app.register_blueprint(weather_bp)
 app.register_blueprint(calculator_bp)
 app.register_blueprint(group_bp)
+app.register_blueprint(chat_bp)
 
 @jwt.token_in_blocklist_loader
 def check_if_token_in_blocklist(jwt_header, jwt_payload):
