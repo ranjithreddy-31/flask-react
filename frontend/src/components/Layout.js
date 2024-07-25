@@ -13,6 +13,15 @@ function Layout({ children }) {
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const [currentUser, setCurrentUser] = useState();
+
+  useEffect(()=>{
+    const fetchUserName = async () => {
+      const username = await getCurrentUser();
+      setCurrentUser(username);
+    }
+    fetchUserName();  
+  })
 
   const handleLogoutClick = async () => {
     const success = await logout();
@@ -49,7 +58,7 @@ function Layout({ children }) {
         <button className="nav-button" onClick={() => navigate('/home')}>Home</button>
         <div className="dropdown" ref={dropdownRef}>
           <button className="nav-button dropdown-toggle" onClick={toggleDropdown}>
-            Account
+            {currentUser}
           </button>
           {isDropdownOpen && (
             <div className="dropdown-menu">
