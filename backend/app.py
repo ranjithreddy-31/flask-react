@@ -1,3 +1,4 @@
+# app.py
 from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
@@ -6,7 +7,7 @@ from models import db
 from constants import SQLALCHEMY_DATABASE_URI, SECRET_KEY, JWT_SECRET_KEY, UPLOAD_FOLDER
 from blacklist import blacklist
 import nltk
-from chat import init_socketio, socketio
+from socketio_module import init_socketio, socketio
 
 # Initialize the punkt tokenizer data
 nltk.download('punkt')

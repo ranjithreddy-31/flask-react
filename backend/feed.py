@@ -4,8 +4,34 @@ from models import Feed, Comment, User, Group, db
 import os
 from werkzeug.utils import secure_filename
 import base64
+from socketio_module import socketio
 
 feed_bp = Blueprint('feed', __name__)
+
+def emit_new_feed(feed, group_code):
+    socketio.emit('new_feed', {
+        'id': feed.id,
+        'heading': feed.heading,
+        'content': feed.content,
+        'picture': feed.picture,
+        'created_by': User.query.get(feed.created_by).username,
+        'created_at': feed.created_at.isoformat(),
+        'groupCode': group_code
+    }, room=group_code)
+
+def emit_delete_feed(feed_id, group_code):
+    socketio.emit('delete_feed', {'feed_id': feed_id}, room=group_code)
+
+def emit_update_feed(feed, group_code):
+    socketio.emit('update_feed', {
+        'id': feed.id,
+        'heading': feed.heading,
+        'content': feed.content,
+        'picture': feed.picture,
+        'created_by': User.query.get(feed.created_by).username,
+        'created_at': feed.created_at.isoformat(),
+        'groupCode': group_code
+    }, room=group_code)
 
 @feed_bp.route('/addFeed', methods=['POST'])
 @jwt_required()
@@ -42,11 +68,14 @@ def add_feed():
 
         db.session.commit()
 
+        # Emit the new feed to all clients in the group
+        emit_new_feed(new_feed, group_code)
+
         return jsonify({'message': 'Feed added successfully', 'feed_id': new_feed.id}), 201
     except Exception as e:
         db.session.rollback()
         return jsonify({'message': f'Failed to add the feed due to error : {e}'}), 500
-        
+
 @feed_bp.route("/getAllFeeds", methods=["GET"])
 @jwt_required()
 def get_all_feeds():
@@ -80,11 +109,14 @@ def delete_feed():
     FeedId = data["postId"]
     try:
         feed = Feed.query.get(FeedId)
+        group_code = Group.query.get(feed.group_id).code
         db.session.delete(feed)
         db.session.commit()
 
-        return jsonify({"message": "Fedd deleted successfully"}), 200
+        # Emit the feed deletion to all clients in the group
+        emit_delete_feed(FeedId, group_code)
 
+        return jsonify({"message": "Feed deleted successfully"}), 200
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": f"An error occurred: {str(e)}"}), 500
@@ -118,8 +150,10 @@ def update_feed(feedId):
 
     db.session.commit()
 
-    return jsonify({'message': 'Feed updated successfully'}), 200
+    # Emit the feed update to all clients in the group
+    emit_update_feed(feed, Group.query.get(feed.group_id).code)
 
+    return jsonify({'message': 'Feed updated successfully'}), 200
 
 @feed_bp.route('/uploads/<filename>', methods=["GET"])
 def uploaded_file(filename):
@@ -190,5 +224,4 @@ def jsonify_feeds(pagination):
         'total': pagination.total,
         'pages': pagination.pages,
         'current_page': 1
-
     })
