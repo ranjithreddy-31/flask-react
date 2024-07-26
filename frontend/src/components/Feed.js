@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
 import axios from 'axios';
+import io from 'socket.io-client';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import AddFeed from './AddFeed';
 import { deletePost, getCurrentUser, isTokenExpired, showFeeds, updateFeed } from './Utils';
@@ -24,7 +25,8 @@ function Feed() {
     const [editPhoto, setEditPhoto] = useState(null);
     const [editPhotoPreview, setEditPhotoPreview] = useState(null);
     const [error, setError] = useState(null);
-    const intervalRef = useRef(null);
+    // const intervalRef = useRef(null);
+    const socketRef = useRef();
 
     const fetchPosts = useCallback(async () => {
         try {
@@ -69,18 +71,40 @@ function Feed() {
         };
         fetchCurrentUser();
 
+        socketRef.current = io('http://127.0.0.1:5000');
+
+        socketRef.current.on('connect', () => {
+            console.log('Socket connected');
+            socketRef.current.emit('join', { groupCode });
+        });
+
+        socketRef.current.on('new_feed', (feed) => {
+            setPosts((prevPosts) => [feed, ...prevPosts]);
+        });
+
+        socketRef.current.on('delete_feed', ({ feed_id }) => {
+            setPosts((prevPosts) => prevPosts.filter(post => post.id !== feed_id));
+        });
+
+        socketRef.current.on('update_feed', (updatedFeed) => {
+            setPosts((prevPosts) => prevPosts.map(post => 
+            post.id === updatedFeed.id ? updatedFeed : post
+            ));
+        });
+        /*
+        This part of code is now deprecated as we are using sockets to update in real time
         if (intervalRef.current) {
             clearInterval(intervalRef.current);
         }
 
-        intervalRef.current = setInterval(fetchPosts, 5000); // Fetch every 5 seconds
+        intervalRef.current = setInterval(fetchPosts, 5000000); // Fetch every 5 seconds
 
         return () => {
             if (intervalRef.current) {
                 clearInterval(intervalRef.current);
             }
-        };
-    }, [fetchPosts, refreshTrigger]);
+        };*/
+    }, [fetchPosts, refreshTrigger, groupCode]);
 
     const handleFeedAdded = () => {
         setRefreshTrigger(prev => prev + 1);

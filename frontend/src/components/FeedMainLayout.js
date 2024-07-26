@@ -1,12 +1,23 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Outlet } from 'react-router-dom';
 import FeedGroups from './FeedGroups';
+import { isTokenExpired } from './Utils';
 import '../css/FeedMainLayout.css';
 import Layout from './Layout';
 
 function FeedMainLayout() {
     const [leftWidth, setLeftWidth] = useState(20);
     const leftPaneRef = useRef(null);
+    const navigate = useNavigate();
+
+    useEffect(()=>{
+        const token = localStorage.getItem('token');
+        if (isTokenExpired(token)) {
+            navigate('/login');
+                return;
+        }
+    })
 
     const handleMouseDown = useCallback((e) => {
         e.preventDefault();

@@ -1,13 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import io from 'socket.io-client';
-import { isTokenExpired } from './Utils';
+import { getCurrentUser, isTokenExpired } from './Utils';
+import { useNavigate } from 'react-router-dom';
 import '../css/Chat.css';
 
 function Chat({ groupCode }) {
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
     const [error, setError] = useState(null);
+    const [currentUser, setCurrentUser] = useState();
+    const navigate = useNavigate();
     const socketRef = useRef();
     const chatContainerRef = useRef();
 
@@ -16,6 +19,10 @@ function Chat({ groupCode }) {
         if (isTokenExpired(token)) {
             setError('Session expired. Please log in again.');
             return;
+        }
+
+        const fetchCurrentUser = async() =>{
+            setCurrentUser(await getCurrentUser());
         }
 
         const fetchMessages = async () => {
@@ -30,11 +37,10 @@ function Chat({ groupCode }) {
                 setError('Failed to fetch messages. Please try again.');
             }
         };
-
+        fetchCurrentUser();
         fetchMessages();
 
         socketRef.current = io('http://127.0.0.1:5000');
-        socketRef.current.emit('join', { groupCode });
 
         socketRef.current.on('connect', () => {
             console.log('Socket connected');
@@ -80,6 +86,10 @@ function Chat({ groupCode }) {
         }
     };
 
+    const handleUserClick = (username) =>{
+        navigate(`/profile/${username}`, { state: { groupCode } });
+    }
+
     return (
         <div className="chat-container">
             <div className="chat-header">
@@ -88,8 +98,16 @@ function Chat({ groupCode }) {
             {error && <p className="error-message">{error}</p>}
             <div className="chat-messages" ref={chatContainerRef}>
                 {messages.map((msg, index) => (
-                    <div key={index} className="chat-message">
-                        <strong>{msg.user}</strong>: {msg.text}
+                    <div key={index} className={`chat-message ${currentUser === msg.user ? 'chat-message-right' : 'chat-message-left'}`}>
+                        {console.log(currentUser, currentUser === msg.user ? 'chat-message-right' : 'chat-message-left')}
+                        <strong>
+                            <button
+                                onClick={() => handleUserClick(msg.user)}
+                                className="chat-user-link"
+                            >
+                            {msg.user}
+                            </button>
+                        </strong>: {msg.text}
                         <span className="chat-message-time">{new Date(msg.timestamp).toLocaleString()}</span>
                     </div>
                 ))}
