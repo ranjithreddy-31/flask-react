@@ -2,25 +2,35 @@
 .home-container {
     max-width: 800px;
     margin: 0 auto;
-    padding: 2rem;
+    padding: 10px;
     font-family: 'Arial', sans-serif;
     background-color: #f0f2f5;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
+    background-image: url('../../public/home_bg.jpg'); /* Directly from the public folder */
+    background-size: cover;
+    background-position: center;
+    z-index: -1; 
+    /* background-image: linear-gradient(to right, #0F67B1, #3FA2F6, #96C9F4, #FAFFAF); */
 }
 
 .home-title {
     color: #1877f2;
     font-size: 2.5rem;
     margin-bottom: 1rem;
+    margin-left: 60rem;
 }
 
 .home-welcome {
-    font-size: 1.2rem;
-    color: #65676b;
-    margin-bottom: 2rem;
+    font-size: 1.2rem;             /* Font size for the text */
+    color: #0c5f8b;                /* Text color */
+    margin-bottom: 2rem;           /* Space below the element */
+    text-align: left;              /* Align text to the left */
+    padding: 20px;                 /* Padding around the content */
+    width: 100%;                   /* Ensure it takes the full width of its container */
+    box-sizing: border-box;
 }
 
 .button-container {
@@ -29,6 +39,16 @@
     justify-content: center;
     gap: 1rem;
     margin-bottom: 2rem;
+}
+
+.home-content {
+    text-align: left;              /* Align text to the left */
+    display: flex;                /* Use flexbox for layout */
+    flex-direction: column;       /* Arrange children in a column */
+    align-items: center;          /* Center items along the cross axis (default for flex-direction: column) */
+    margin-inline-end: inherit;   /* Use inherited margin on the end side (right for LTR languages) */
+    padding-right: revert-layer;  /* Remove any padding right applied by parent styles */
+    width: 40%;    
 }
 
 .home-button {
@@ -40,6 +60,8 @@
     transition: all 0.3s ease;
     background-color: #e7f3ff;
     color: #1877f2;
+    position: fixed; 
+    bottom: 30px; 
 }
 
 .home-button:hover {

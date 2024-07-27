@@ -20,13 +20,15 @@ const Home = () => {
     return (
         <Layout>
             <div className="home-container">
-                <h1 className="home-title">Home Page</h1>
-                <p className="home-welcome">Welcome to the Home Page!</p>
+            <div class="home-content">
+                <h1 className="home-title">Welcome</h1>
+                <p className="home-welcome">Where every chat sparks a connection and every feed tells a story.</p>
+                </div>    
                 <div className="button-container">
-                    <button className="home-button" onClick={() => handleNavigation('scrape_data')}>Web Scraping</button>
+                    {/* <button className="home-button" onClick={() => handleNavigation('scrape_data')}>Web Scraping</button>
                     <button className="home-button" onClick={() => handleNavigation('todo_list')}>Todo List</button>
                     <button className="home-button" onClick={() => handleNavigation('calculator')}>Calculator</button>
-                    <button className="home-button" onClick={() => handleNavigation('weather')}>Weather</button>
+                    <button className="home-button" onClick={() => handleNavigation('weather')}>Weather</button> */}
                     <button className="home-button" onClick={() => handleNavigation('feed')}>Feed</button>
                 </div>
             </div>
