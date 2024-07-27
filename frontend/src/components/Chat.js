@@ -98,16 +98,33 @@ function Chat({ groupCode }) {
             {error && <p className="error-message">{error}</p>}
             <div className="chat-messages" ref={chatContainerRef}>
                 {messages.map((msg, index) => (
-                    <div key={index} className={`chat-message ${currentUser === msg.user ? 'chat-message-right' : 'chat-message-left'}`}>
-                        <strong>
-                            <button
-                                onClick={() => handleUserClick(msg.user)}
-                                className="chat-user-link"
-                            >
-                            {msg.user}
-                            </button>
-                        </strong>: {msg.text}
-                        <span className="chat-message-time">{new Date(msg.timestamp).toLocaleString()}</span>
+                    <div key={index} className={`chat-message-wrapper ${currentUser === msg.user ? 'chat-message-right' : 'chat-message-left'}`}>
+                        {currentUser !== msg.user && (
+                            <div className="profile-photo">
+                                {msg.user.charAt(0).toUpperCase()}
+                            </div>
+                        )}
+                        <div className={`chat-message ${currentUser === msg.user ? 'chat-message-right' : 'chat-message-left'}`}>
+                            {currentUser !== msg.user}
+                             {/* && (
+                                <strong>
+                                    <button
+                                        onClick={() => handleUserClick(msg.user)}
+                                        className="chat-user-link"
+                                    >
+                                        {msg.user}: 
+                                    </button>
+                                </strong>
+                            )} */}
+                             {msg.text}
+                             <span className="chat-message-time">
+    {new Date(msg.timestamp).toLocaleDateString([], {
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit'
+    })} {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
+</span>
+                        </div>
                     </div>
                 ))}
             </div>
@@ -123,6 +140,7 @@ function Chat({ groupCode }) {
             </form>
         </div>
     );
+    
 }
 
 export default Chat;

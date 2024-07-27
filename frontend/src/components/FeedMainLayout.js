@@ -44,7 +44,7 @@ function FeedMainLayout() {
                 <div 
                     className="pane left-pane" 
                     ref={leftPaneRef}
-                    style={{ width: `${leftWidth}%` }}
+                    style={{ width: `${leftWidth}%`, marginTop: '10px' }}
                 >
                     <FeedGroups />
                 </div>

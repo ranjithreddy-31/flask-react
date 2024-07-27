@@ -28,6 +28,7 @@ body, html {
     max-width: 680px;
     margin: 0 auto;
     padding: 20px;
+    padding-top: 0px;
     height: 90vh;
     display: flex;
     flex-direction: column;
