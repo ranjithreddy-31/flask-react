@@ -99,7 +99,6 @@ function Chat({ groupCode }) {
             <div className="chat-messages" ref={chatContainerRef}>
                 {messages.map((msg, index) => (
                     <div key={index} className={`chat-message ${currentUser === msg.user ? 'chat-message-right' : 'chat-message-left'}`}>
-                        {console.log(currentUser, currentUser === msg.user ? 'chat-message-right' : 'chat-message-left')}
                         <strong>
                             <button
                                 onClick={() => handleUserClick(msg.user)}

@@ -2,25 +2,25 @@
     background-color: #f0f2f5;
     border-radius: 8px;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-    padding: 12px;
+    padding: 20px;
     margin-bottom: 20px;
 }
 
 .feed-groups-title {
     color: #1877f2;
     font-size: 1.8rem;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
     text-align: center;
 }
 
 .feed-groups-actions {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
 }
 
 .feed-groups-button {
-    padding: 8px 12px;
+    padding: 10px 15px;
     background-color: #1877f2;
     color: #fff;
     border: none;
@@ -29,6 +29,8 @@
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.3s;
+    flex: 1;
+    margin: 0 5px;
 }
 
 .feed-groups-button:hover {
@@ -38,13 +40,13 @@
 .feed-groups-form {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    margin-bottom: 15px;
+    gap: 15px;
+    margin-bottom: 20px;
 }
 
 .feed-groups-input,
 .feed-groups-textarea {
-    border: none;
+    border: 1px solid #dddfe2;
     font-size: 16px;
     padding: 12px;
     resize: none;
@@ -55,6 +57,7 @@
 .feed-groups-input:focus,
 .feed-groups-textarea:focus {
     outline: none;
+    border-color: #1877f2;
     box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.2);
 }
 
@@ -63,7 +66,7 @@
 }
 
 .feed-groups-submit {
-    padding: 8px 12px;
+    padding: 10px 15px;
     background-color: #1877f2;
     color: #fff;
     border: none;
@@ -97,35 +100,47 @@
 .feed-group-item {
     display: flex;
     align-items: center;
-    padding: 12px;
+    justify-content: space-between;
+    padding: 15px;
     background-color: #ffffff;
     border-radius: 8px;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
     text-decoration: none;
     color: #1c1e21;
     transition: background-color 0.3s;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .feed-group-item:hover {
     background-color: #f2f3f5;
 }
 
+.feed-group-link {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    text-decoration: none;
+    color: inherit;
+}
+
 .feed-group-avatar {
-    width: 40px;
-    height: 40px;
-    background-color: #007bff;
+    width: 50px;
+    height: 50px;
+    background-color: #1877f2;
     color: #ffffff;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    margin-right: 12px;
+    margin-right: 15px;
+    font-size: 18px;
 }
 
 .feed-group-info h3 {
     margin: 0;
-    font-size: 16px;
+    font-size: 18px;
+    color: #1c1e21;
 }
 
 .feed-group-info p {
@@ -137,10 +152,107 @@
 .feed-groups-empty {
     text-align: center;
     color: #65676b;
-    font-size: 14px;
-    margin-top: 20px;
+    font-size: 16px;
+    margin-top: 30px;
 }
 
 .feed-groups-button.active {
     background-color: #166fe5;
+}
+
+.group-menu {
+    position: relative;
+}
+
+.menu-toggle {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #65676b;
+    cursor: pointer;
+    padding: 5px 10px;
+}
+
+.menu-dropdown {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background-color: white;
+    border: 1px solid #dddfe2;
+    border-radius: 6px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    z-index: 10;
+    min-width: 120px;
+}
+
+.menu-dropdown button {
+    display: block;
+    width: 100%;
+    padding: 10px 15px;
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    color: #1c1e21;
+    transition: background-color 0.2s;
+}
+
+.menu-dropdown button:hover {
+    background-color: #f2f3f5;
+}
+
+.menu-dropdown button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.edit-post-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+    background-color: #f0f2f5;
+    border-radius: 6px;
+}
+
+.edit-heading-input {
+    border: 1px solid #dddfe2;
+    font-size: 16px;
+    padding: 10px;
+    border-radius: 6px;
+}
+
+.buttons-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.action-button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.post-button {
+    background-color: #1877f2;
+    color: #fff;
+}
+
+.post-button:hover {
+    background-color: #166fe5;
+}
+
+.cancel-button {
+    background-color: #e4e6eb;
+    color: #1c1e21;
+}
+
+.cancel-button:hover {
+    background-color: #d8dadf;
 }

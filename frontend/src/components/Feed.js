@@ -57,20 +57,13 @@ function Feed() {
                 if (error.response && error.response.status === 403) {
                     setError(`Error fetching posts: You are currently not part of this group`);
                 } else {
-                    setError(`Error fetching posts: ${error}`);
+                    setError(`Error fetching posts: Group is deleted by Admin`);
                 }
             }
         }
     }, [currentPage, groupCode, navigate]);
 
-    useEffect(() => {
-        fetchPosts();
-        const fetchCurrentUser = async () => {
-            const user = await getCurrentUser();
-            setCurrentUser(user);
-        };
-        fetchCurrentUser();
-
+    useEffect(()=>{
         socketRef.current = io('http://127.0.0.1:5000');
 
         socketRef.current.on('connect', () => {
@@ -91,6 +84,20 @@ function Feed() {
             post.id === updatedFeed.id ? updatedFeed : post
             ));
         });
+
+        socketRef.current.on('delete_group', ({ groupCode }) => {
+            setPosts([]);
+        });
+    }, [groupCode])
+
+    useEffect(() => {
+        fetchPosts();
+        const fetchCurrentUser = async () => {
+            const user = await getCurrentUser();
+            setCurrentUser(user);
+        };
+        fetchCurrentUser();
+
         /*
         This part of code is now deprecated as we are using sockets to update in real time
         if (intervalRef.current) {
@@ -228,7 +235,7 @@ function Feed() {
             <div className="feed-section">
                 <div className="feed-container">
                     {/* {error && <h1>{error}</h1>} */}
-                    <AddFeed onFeedAdded={handleFeedAdded} groupCode={groupCode} />
+                    {!error && <AddFeed onFeedAdded={handleFeedAdded} groupCode={groupCode} />}
                     {showFeeds(
                         posts,
                         isAuthorized,
@@ -260,7 +267,7 @@ function Feed() {
                 </div>
             </div>
             <div className="chat-section">
-                <Chat groupCode={groupCode} />
+                {!error && <Chat groupCode={groupCode} />}
             </div>
         </div>
     );

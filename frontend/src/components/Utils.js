@@ -113,7 +113,7 @@ export const showFeeds = (
     return (
         <div className="posts-section">
             {posts.map(post => (
-                <div key={post.id} className="post-item">
+                <div key={`${groupCode}_${post.id}`} className="post-item">
                     <div className="post-header">
                         {editingPost === post.id ? (
                             <input
