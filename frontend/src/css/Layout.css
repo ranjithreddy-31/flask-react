@@ -53,7 +53,7 @@
   flex-grow: 1;
   padding: 2rem;
   overflow: hidden; /* Ensure no overflow from the pseudo-element */
-    background-image: linear-gradient(to right, #202542, #442746, #843260); /* Gradient from left to right */
+  background-image: linear-gradient(to right, #0F67B1, #3FA2F6, #96C9F4, #FAFFAF);
 
 }
 
