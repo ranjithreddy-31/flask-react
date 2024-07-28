@@ -16,6 +16,7 @@ def emit_new_feed(feed, group_code):
         'picture': feed.picture,
         'created_by': User.query.get(feed.created_by).username,
         'created_at': feed.created_at.isoformat(),
+        'comments': feed.comments,
         'groupCode': group_code
     }, room=group_code)
 
@@ -121,7 +122,7 @@ def delete_feed():
         db.session.rollback()
         return jsonify({"message": f"An error occurred: {str(e)}"}), 500
 
-@feed_bp.route('/updateFeed/<int:feedId>', methods=['PUT'])
+@feed_bp.route('/updateFeed/<int:feedId>', methods=["PUT"])
 @jwt_required()
 def update_feed(feedId):
     current_user = get_jwt_identity()

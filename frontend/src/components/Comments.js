@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPencilAlt, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import { faPencilAlt, faTrashAlt, faSave, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { getCurrentUser, isTokenExpired } from './Utils';
 import "../css/Comment.css";
 
@@ -10,6 +10,8 @@ function Comments({ comments, groupCode }) {
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState(null);
   const [localComments, setLocalComments] = useState(comments);
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editedCommentText, setEditedCommentText] = useState('');
 
   const fetchCurrentUser = useCallback(async () => {
     try {
@@ -32,8 +34,41 @@ function Comments({ comments, groupCode }) {
     navigate(`/profile/${username}`, { state: { groupCode } });
   }
 
-  const handleEditComment = (commentId) => {
-    console.log("You clicked edit comment", commentId);
+  const handleEditComment = (commentId, commentText) => {
+    setEditingCommentId(commentId);
+    setEditedCommentText(commentText);
+  }
+
+  const handleSaveEdit = async (commentId) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (isTokenExpired(token)) {
+        navigate('/login');
+        return;
+      }
+      await axios.put('http://127.0.0.1:5000/updateComment', {
+        commentId: commentId,
+        newComment: editedCommentText
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      setLocalComments(prevComments => 
+        prevComments.map(comment => 
+          comment.id === commentId ? {...comment, comment: editedCommentText} : comment
+        )
+      );
+      setEditingCommentId(null);
+    } catch (error) {
+      console.error('Error updating comment:', error);
+    }
+  }
+
+  const handleCancelEdit = () => {
+    setEditingCommentId(null);
+    setEditedCommentText('');
   }
 
   const handleDeleteComment = async (commentId) => {
@@ -52,7 +87,6 @@ function Comments({ comments, groupCode }) {
           commentId: commentId
         }
       });
-      // Update local state after successful deletion
       setLocalComments(prevComments => prevComments.filter(comment => comment.id !== commentId));
     } catch (error) {
       console.error('Error deleting comment:', error);
@@ -66,21 +100,48 @@ function Comments({ comments, groupCode }) {
           localComments.map(comment => (
             <div key={comment.id} className="comment-item">
               <div className="comment-content-wrapper">
-                <p className="comment-content">{comment.comment}</p>
-                <div className="comment-actions">
-                  <FontAwesomeIcon 
-                    icon={faPencilAlt} 
-                    className="edit-icon"
-                    style={{ opacity: currentUser === comment.added_by ? 1 : 0.5 }}
-                    onClick={() => currentUser === comment.added_by && handleEditComment(comment.id)}
-                  />
-                  <FontAwesomeIcon 
-                    icon={faTrashAlt} 
-                    className="delete-icon"
-                    style={{ opacity: currentUser === comment.added_by ? 1 : 0.5 }}
-                    onClick={() => currentUser === comment.added_by && handleDeleteComment(comment.id)}
-                  />
-                </div>
+                {editingCommentId === comment.id ? (
+                  <div className="edit-comment-form">
+                    <input
+                      type='text'
+                      value={editedCommentText}
+                      onChange={(e) => setEditedCommentText(e.target.value)}
+                      className="edit-comment-input"
+                    />
+                    <div className="edit-comment-actions">
+                      <div class="icon-container">
+                      <FontAwesomeIcon 
+                        icon={faSave} 
+                        className="save-icon"
+                        onClick={() => handleSaveEdit(comment.id)}
+                      />
+                      <FontAwesomeIcon 
+                        icon={faTimes} 
+                        className="cancel-icon"
+                        onClick={handleCancelEdit}
+                      />
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <p className="comment-content">{comment.comment}</p>
+                    <div className="comment-actions">
+                      <FontAwesomeIcon 
+                        icon={faPencilAlt} 
+                        className="edit-icon"
+                        style={{ opacity: currentUser === comment.added_by ? 1 : 0.5 }}
+                        onClick={() => currentUser === comment.added_by && handleEditComment(comment.id, comment.comment)}
+                      />
+                      <FontAwesomeIcon 
+                        icon={faTrashAlt} 
+                        className="delete-icon"
+                        style={{ opacity: currentUser === comment.added_by ? 1 : 0.5 }}
+                        onClick={() => currentUser === comment.added_by && handleDeleteComment(comment.id)}
+                      />
+                    </div>
+                  </>
+                )}
               </div>
               <p className="comment-meta">
                 <span 

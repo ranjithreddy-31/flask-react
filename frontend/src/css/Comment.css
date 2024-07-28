@@ -4,26 +4,28 @@
     --border-color: #ddd;
     --text-color-primary: #333;
     --text-color-secondary: #65676b;
+    --hover-color: #f8f9fa;
+    --shadow-color: rgba(0, 0, 0, 0.1);
 }
 
 /* Container Styling */
 .chat-container {
     display: flex;
     flex-direction: column;
-    height: 85%;
+    height: 85vh;
     border: 1px solid var(--border-color);
     border-radius: 10px;
     overflow: hidden;
     background-color: var(--background-color);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 10px var(--shadow-color);
 }
 
 /* Header Styling */
 .chat-header {
     background-color: #f7f7f7;
-    padding: 12px 16px;
+    padding: 15px 20px;
     border-bottom: 1px solid var(--border-color);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 3px var(--shadow-color);
 }
 
 .chat-header h2 {
@@ -36,16 +38,16 @@
 .chat-messages {
     flex: 1;
     overflow-y: auto;
-    padding: 12px;
+    padding: 15px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 15px;
 }
 
 .chat-message-wrapper {
     display: flex;
     align-items: flex-start;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 }
 
 .chat-message-left .chat-message-wrapper {
@@ -58,10 +60,10 @@
 
 .chat-message {
     background-color: #e9f5ff;
-    border-radius: 10px;
-    padding: 10px 15px;
-    max-width: 90%;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    border-radius: 18px;
+    padding: 12px 18px;
+    max-width: 70%;
+    box-shadow: 0 1px 2px var(--shadow-color);
     word-wrap: break-word;
     position: relative;
     overflow: hidden;
@@ -70,77 +72,81 @@
 .chat-message-right {
     align-self: flex-end;
     background-color: #d1e7dd;
-    border-radius: 10px;
 }
 
 .chat-message-text {
     margin: 0;
     font-size: 1rem;
     color: var(--text-color-primary);
+    line-height: 1.4;
 }
 
 .chat-message-time {
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     color: var(--text-color-secondary);
     display: block;
     margin-top: 5px;
 }
 
 .profile-photo {
-    width: 30px;
-    height: 30px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     background-color: #43c068;
     color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 15px;
+    font-size: 16px;
     font-weight: bold;
     text-transform: uppercase;
-    margin-right: 10px;
+    margin-right: 12px;
 }
 
 /* Input Container */
 .chat-input-container {
     display: flex;
-    padding: 10px 15px;
+    padding: 15px;
     border-top: 1px solid var(--border-color);
     background-color: #f7f7f7;
-    box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 -1px 3px var(--shadow-color);
 }
 
 .chat-input {
     flex: 1;
-    padding: 10px;
+    padding: 12px 15px;
     border: 1px solid var(--border-color);
-    border-radius: 20px;
-    margin-right: 10px;
+    border-radius: 25px;
+    margin-right: 12px;
     outline: none;
-    transition: border-color 0.3s;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    font-size: 1rem;
 }
 
 .chat-input:focus {
     border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
 
 .chat-send-button {
-    padding: 10px 20px;
+    padding: 12px 24px;
     background-color: var(--primary-color);
     color: #fff;
     border: none;
-    border-radius: 20px;
+    border-radius: 25px;
     cursor: pointer;
     transition: background-color 0.3s, transform 0.2s;
+    font-size: 1rem;
+    font-weight: bold;
 }
 
 .chat-send-button:hover {
     background-color: #0056b3;
-    transform: scale(1.05);
+    transform: translateY(-1px);
 }
 
 .chat-send-button:active {
-    transform: scale(0.95);
+    transform: translateY(1px);
 }
 
 .chat-user-link {
@@ -148,9 +154,14 @@
     border: none;
     padding: 0;
     font: inherit;
-    color: #000000;
+    color: var(--primary-color);
     cursor: pointer;
     font-weight: bold;
+    text-decoration: none;
+}
+
+.chat-user-link:hover {
+    text-decoration: underline;
 }
 
 /* Comments Styling */
@@ -163,28 +174,29 @@
 .comments-list {
     max-height: 300px;
     overflow-y: auto;
+    padding-right: 10px;
 }
 
 .comment-item {
     background-color: var(--background-color);
     border-radius: 8px;
-    padding: 12px;
+    padding: 10px;
     margin-bottom: 10px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 2px var(--shadow-color);
     position: relative;
     transition: background-color 0.2s ease;
 }
 
 .comment-item:hover {
-    background-color: #f8f9fa;
+    background-color: var(--hover-color);
 }
 
 .comment-content {
-    font-size: 14px;
+    font-size: 13px;
     line-height: 1.4;
     color: var(--text-color-primary);
-    margin-bottom: 8px;
-    padding-right: 60px; /* Make space for icons */
+    margin-bottom: 5px;
+    padding-right: 40px;
 }
 
 .comment-meta {
@@ -203,6 +215,7 @@
     padding: 0;
     font-size: inherit;
     margin-right: 5px;
+    text-decoration: none;
 }
 
 .user-link:hover {
@@ -217,13 +230,13 @@
     font-style: italic;
     color: var(--text-color-secondary);
     text-align: center;
-    padding: 10px;
+    padding: 20px;
 }
 
 .comment-actions {
     position: absolute;
-    top: 12px;
-    right: 12px;
+    top: 15px;
+    right: 15px;
     display: flex;
     opacity: 0;
     transition: opacity 0.2s ease-in-out;
@@ -235,9 +248,9 @@
 
 .edit-icon, .delete-icon {
     cursor: pointer;
-    margin-left: 10px;
+    margin-left: 12px;
     color: var(--text-color-secondary);
-    font-size: 14px;
+    font-size: 16px;
     transition: color 0.2s ease;
 }
 
@@ -252,6 +265,7 @@
 
 .comments-list::-webkit-scrollbar-track {
     background: #f1f1f1;
+    border-radius: 4px;
 }
 
 .comments-list::-webkit-scrollbar-thumb {
@@ -263,57 +277,71 @@
     background: #555;
 }
 
-/* New styles for edit mode */
+/* Edit mode styles */
 .edit-comment-form {
+    position: relative;
+    width: 100%;
     margin-top: 10px;
 }
 
 .edit-comment-input {
     width: 100%;
-    padding: 8px;
+    padding: 12px 40px 12px 15px;
     border: 1px solid var(--border-color);
-    border-radius: 4px;
+    border-radius: 20px;
     font-size: 14px;
-    resize: vertical;
+    resize: none;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.edit-comment-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
 
 .edit-comment-actions {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
     display: flex;
-    justify-content: flex-end;
-    margin-top: 8px;
+    align-items: center;
 }
 
-.save-comment-btn, .cancel-edit-btn {
-    padding: 6px 12px;
-    border: none;
-    border-radius: 4px;
+.icon-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.save-icon,
+.cancel-icon {
     cursor: pointer;
-    font-size: 12px;
-    transition: background-color 0.2s ease;
+    font-size: 18px;
+    color: var(--primary-color);
+    transition: color 0.2s ease, transform 0.2s ease;
 }
 
-.save-comment-btn {
-    background-color: var(--primary-color);
-    color: white;
-    margin-right: 8px;
+.save-icon:hover,
+.cancel-icon:hover {
+    color: #0056b3;
+    transform: scale(1.1);
 }
 
-.save-comment-btn:hover {
-    background-color: #0056b3;
-}
-
-.cancel-edit-btn {
-    background-color: #f8f9fa;
+.cancel-icon {
     color: var(--text-color-secondary);
 }
 
-.cancel-edit-btn:hover {
-    background-color: #e2e6ea;
+.cancel-icon:hover {
+    color: #dc3545;
 }
 
 /* Comment input container */
 .comment-input-container {
-    margin-top: 10px;
+    margin-top: 15px;
+    position: relative;
 }
 
 .input-wrapper {
@@ -324,21 +352,25 @@
 }
 
 .comment-input {
-    flex: 1;
-    padding: 10px 40px 10px 10px; /* Add padding to the right for the icon */
+    width: 100%;
+    padding: 12px 40px 12px 15px;
     border: 1px solid var(--border-color);
     border-radius: 20px;
     outline: none;
-    transition: border-color 0.3s;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    font-size: 14px;
 }
 
 .comment-input:focus {
     border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
 
 .send-comment-button {
     position: absolute;
-    right: 10px; /* Position the icon inside the input */
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
     background: none;
     border: none;
     color: var(--primary-color);
@@ -347,19 +379,33 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 100%;
+    transition: color 0.2s ease, transform 0.2s ease;
 }
 
 .send-comment-button:hover {
     color: #0056b3;
+    transform: translateY(-50%) scale(1.1);
 }
 
 @media (max-width: 600px) {
+    .chat-container {
+        height: 100vh;
+        border-radius: 0;
+    }
+
+    .chat-message {
+        max-width: 85%;
+    }
+
     .comment-content {
         font-size: 13px;
     }
 
     .comment-meta {
         font-size: 11px;
+    }
+
+    .edit-icon, .delete-icon {
+        font-size: 14px;
     }
 }

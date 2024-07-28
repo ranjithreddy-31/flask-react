@@ -102,6 +102,20 @@ function Feed() {
             }));
         });
 
+        socketRef.current.on('update_comment', ({ feed_id, comment }) => {
+            setPosts(prevPosts => prevPosts.map(post => {
+              if (post.id === feed_id) {
+                return {
+                  ...post,
+                  comments: post.comments.map(c => 
+                    c.id === comment.id ? { ...c, ...comment } : c
+                  )
+                };
+              }
+              return post;
+            }));
+          });
+          
         socketRef.current.on('delete_comment', ({ feed_id, comment_id }) => {
             setPosts((prevPosts) => prevPosts.map(post => {
                 if (post.id === feed_id) {
@@ -221,7 +235,7 @@ function Feed() {
     };
 
     const handleUserClick = (username) => {
-        navigate(`/profile/${username}`);
+        navigate(`/profile/${username}`, { state: { groupCode } });
     };
 
     const handleUpdatePost = async (postId) => {
