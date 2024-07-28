@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { isTokenExpired, getUserProfile, showFeeds, deletePost, updateFeed, getCurrentUser } from './Utils';
 import Layout from './Layout';
@@ -20,7 +20,8 @@ function UserProfile() {
     const [currentUser, setCurrentUser] = useState(null);
     const { username } = useParams();
     const navigate = useNavigate();
-    const groupCode = localStorage.getItem("currentGroup");
+    const location = useLocation();
+    const [groupCode, setGroupCode] = useState(location.state?.groupCode || null);
 
     useEffect(() => {
         const fetchUserProfile = async () => {
@@ -34,16 +35,19 @@ function UserProfile() {
                 }
             }
         };
+
         const fetchCurrentUser = async () => {
             const user = await getCurrentUser();
             setCurrentUser(user);
         };
+
         fetchCurrentUser();
         fetchUserProfile();
-    }, [username, refreshTrigger, navigate, groupCode]);
+        setGroupCode(location.state?.groupCode || null);
+    }, [username, refreshTrigger, navigate, location, groupCode]);
 
     const handleUserClick = (createdBy) => {
-        navigate(`/profile/${createdBy}`);
+        navigate(`/profile/${createdBy}`, { state: { groupCode } });
     };
 
     const handleCommentChange = (postId, value) => {
@@ -129,10 +133,11 @@ function UserProfile() {
     const handleDeletePost = async(postId) => {
         const token = localStorage.getItem('token');
         if(isTokenExpired(token)){
-            navigate('/');
+            navigate('/login');
+            return;
         }
         await deletePost(postId, token);
-        setRefreshTrigger(prev => prev+1);
+        setRefreshTrigger(prev => prev + 1);
     };
 
     if (error) return <div className="alert alert-danger">Error: {error}</div>;

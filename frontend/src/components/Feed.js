@@ -57,7 +57,7 @@ function Feed() {
                 if (error.response && error.response.status === 403) {
                     setError(`Error fetching posts: You are currently not part of this group`);
                 } else {
-                    setError(`Error fetching posts: Group is deleted by Admin`);
+                    setError(`Group doesn't exist or deleted by Admin`);
                 }
             }
         }
@@ -87,6 +87,7 @@ function Feed() {
 
         socketRef.current.on('delete_group', ({ groupCode }) => {
             setPosts([]);
+            setError("Group doesn't exist or deleted by Admin")
         });
     }, [groupCode])
 
@@ -267,6 +268,7 @@ function Feed() {
                 </div>
             </div>
             <div className="chat-section">
+                {console.log(error)}
                 {!error && <Chat groupCode={groupCode} />}
             </div>
         </div>

@@ -87,6 +87,7 @@ function Chat({ groupCode }) {
     };
 
     const handleUserClick = (username) =>{
+        console.log(username, groupCode)
         navigate(`/profile/${username}`, { state: { groupCode } });
     }
 
@@ -101,12 +102,19 @@ function Chat({ groupCode }) {
                     <div key={index} className={`chat-message-wrapper ${currentUser === msg.user ? 'chat-message-right' : 'chat-message-left'}`}>
                         {currentUser !== msg.user && (
                             <div className="profile-photo">
-                                {msg.user.charAt(0).toUpperCase()}
+                                <strong>
+                                    <button
+                                        onClick={() => handleUserClick(msg.user)}
+                                        className="chat-user-link"
+                                    >
+                                        {msg.user.charAt(0).toUpperCase()}
+                                        </button>
+                                </strong>
                             </div>
                         )}
                         <div className={`chat-message ${currentUser === msg.user ? 'chat-message-right' : 'chat-message-left'}`}>
-                            {currentUser !== msg.user}
-                             {/* && (
+                            {/* {currentUser !== msg.user
+                             && (
                                 <strong>
                                     <button
                                         onClick={() => handleUserClick(msg.user)}
