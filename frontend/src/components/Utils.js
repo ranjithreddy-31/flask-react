@@ -4,11 +4,11 @@ import React from 'react';
 import Comments from './Comments';
 import '../css/Feed.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPencilAlt, faTrashAlt, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
+import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 
 
-export const isTokenExpired = () => {
-    const token = localStorage.getItem('token');
+export const isTokenExpired = (token) => {
+    
     if (token) {
         try {
             const decodedToken = jwtDecode(token);
@@ -58,7 +58,6 @@ export const getCurrentUser = async() =>{
         if (!token || isTokenExpired(token)) {
             throw new Error('Token expired');
         }
-  
         const response = await axios.get(
           'http://127.0.0.1:5000/getCurrentUser',
           {

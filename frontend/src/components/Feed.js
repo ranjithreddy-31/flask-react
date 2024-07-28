@@ -89,6 +89,30 @@ function Feed() {
             setPosts([]);
             setError("Group doesn't exist or deleted by Admin")
         });
+
+        socketRef.current.on('new_comment', ({ feed_id, comment }) => {
+            setPosts((prevPosts) => prevPosts.map(post => {
+                if (post.id === feed_id) {
+                    return {
+                        ...post,
+                        comments: [...post.comments, comment]
+                    };
+                }
+                return post;
+            }));
+        });
+
+        socketRef.current.on('delete_comment', ({ feed_id, comment_id }) => {
+            setPosts((prevPosts) => prevPosts.map(post => {
+                if (post.id === feed_id) {
+                    return {
+                        ...post,
+                        comments: post.comments.filter(comment => comment.id !== comment_id)
+                    };
+                }
+                return post;
+            }));
+        });
     }, [groupCode])
 
     useEffect(() => {
@@ -268,7 +292,6 @@ function Feed() {
                 </div>
             </div>
             <div className="chat-section">
-                {console.log(error)}
                 {!error && <Chat groupCode={groupCode} />}
             </div>
         </div>

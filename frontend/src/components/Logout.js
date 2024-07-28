@@ -3,11 +3,11 @@ import axios from 'axios';
 import { isTokenExpired } from './Utils';
 
 export const logout = async () => {
-    if (isTokenExpired()){
-        return true;
-    }
     try {
         const token = localStorage.getItem('token');
+        if (isTokenExpired(token)){
+            return true;
+        }
         await axios.post('http://127.0.0.1:5000/logout', {}, {
             headers: {
                 Authorization: `Bearer ${token}`
