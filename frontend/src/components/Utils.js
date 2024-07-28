@@ -2,7 +2,9 @@ import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
 import React from 'react';
 import Comments from './Comments';
-import '../css/Feed.css'
+import '../css/Feed.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPencilAlt, faTrashAlt, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 
 
 export const isTokenExpired = () => {
@@ -225,19 +227,22 @@ export const showFeeds = (
                         {openComments[post.id] ? 'Hide Comments' : 'Show Comments'}
                     </button>
                     {openComments[post.id] && <Comments comments={post.comments} groupCode={groupCode}/>}
-                    <div className="comment-section">
-                        <textarea
-                            value={comments[post.id] || ''}
-                            onChange={(e) => handleCommentChange(post.id, e.target.value)}
-                            placeholder="Add a comment..."
-                            className="comment-input"
-                        />
-                        <button 
-                            onClick={() => handleAddComment(post.id)}
-                            className="comment-button"
-                        >
-                            Add Comment
-                        </button>
+                    <div className="comment-input-container">
+                        <div className="input-wrapper">
+                            <input
+                                type="text"
+                                value={comments[post.id] || ''}
+                                onChange={(e) => handleCommentChange(post.id, e.target.value)}
+                                placeholder="Write a comment..."
+                                className="comment-input"
+                            />
+                            <button 
+                                onClick={() => handleAddComment(post.id)} 
+                                className="send-comment-button"
+                            >
+                                <FontAwesomeIcon icon={faPaperPlane} />
+                            </button>
+                        </div>
                     </div>
                 </div>
             ))}
