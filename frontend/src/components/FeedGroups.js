@@ -73,19 +73,19 @@ function FeedGroups() {
     useEffect(() => {
         fetchUserGroups();
         fetchCurrentUser();
-        // const handleClickOutside = (event) => {
-        //     if (menuRef.current && !menuRef.current.contains(event.target)) {
-        //         setOpenMenus({});
-        //     }
-        // };
+        const handleClickOutside = (event) => {
+            if (menuRef.current && !menuRef.current.contains(event.target)) {
+                setOpenMenus({});
+            }
+        };
 
-        // document.addEventListener('mousedown', handleClickOutside);
-        // return () => {
-        //     if (socketRef.current) {
-        //         socketRef.current.disconnect();
-        //     }
-        //     document.removeEventListener('mousedown', handleClickOutside);
-        // };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            if (socketRef.current) {
+                socketRef.current.disconnect();
+            }
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
 
     }, [fetchUserGroups, refreshTrigger]);
 
@@ -157,7 +157,8 @@ function FeedGroups() {
         setActiveForm(activeForm === 'create' ? null : 'create');
     };
 
-    const toggleMenu = (groupCode) => {
+    const toggleMenu = (event, groupCode) => {
+        event.preventDefault();
         setOpenMenus(prevState => ({
             ...prevState,
             [groupCode]: !prevState[groupCode]
@@ -316,7 +317,7 @@ function FeedGroups() {
                                 </Link>
                             )}
                             <div className="group-menu" ref={menuRef}>
-                                <button onClick={() => toggleMenu(group.code)} className="menu-toggle">
+                                <button onClick={(event) => toggleMenu(event, group.code)} className="menu-toggle">
                                     ⋮
                                 </button>
                                 {openMenus[group.code] && (

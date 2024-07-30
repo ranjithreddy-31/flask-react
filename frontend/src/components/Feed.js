@@ -152,6 +152,20 @@ function Feed() {
         };*/
     }, [fetchPosts, refreshTrigger, groupCode]);
 
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+          if (!event.target.closest('.post-menu')) {
+            setOpenMenus({});
+          }
+        };
+    
+        document.addEventListener('click', handleClickOutside);
+    
+        return () => {
+          document.removeEventListener('click', handleClickOutside);
+        };
+      }, []);
+
     const handleFeedAdded = () => {
         setRefreshTrigger(prev => prev + 1);
     };

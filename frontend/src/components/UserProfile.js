@@ -46,6 +46,20 @@ function UserProfile() {
         setGroupCode(location.state?.groupCode || null);
     }, [username, refreshTrigger, navigate, location, groupCode]);
 
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+          if (!event.target.closest('.post-menu')) {
+            setOpenMenus({});
+          }
+        };
+    
+        document.addEventListener('click', handleClickOutside);
+    
+        return () => {
+          document.removeEventListener('click', handleClickOutside);
+        };
+      }, []);
+
     const handleUserClick = (createdBy) => {
         navigate(`/profile/${createdBy}`, { state: { groupCode } });
     };

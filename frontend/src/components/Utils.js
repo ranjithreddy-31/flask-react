@@ -105,7 +105,8 @@ export const showFeeds = (
     editPhotoPreview,
     groupCode
 ) => {
-    const toggleMenu = (postId) => {
+    const toggleMenu = (event, postId) => {
+        event.preventDefault();
         setOpenMenus(prevState => ({
             ...prevState,
             [postId]: !prevState[postId]
@@ -117,18 +118,12 @@ export const showFeeds = (
                 <div key={`${groupCode}_${post.id}`} className="post-item">
                     <div className="post-header">
                         {editingPost === post.id ? (
-                            <input
-                                type="text"
-                                value={editHeading}
-                                onChange={(e) => setEditHeading(e.target.value)}
-                                className="edit-heading-input"
-                                placeholder="Edit heading"
-                            />
+                            <h3 className="post-heading">{editHeading}</h3>
                         ) : (
                             <h3 className="post-heading">{post.heading}</h3>
                         )}
                         <div className="post-menu">
-                            <button onClick={() => toggleMenu(post.id)} className="menu-toggle">
+                            <button onClick={(event) => toggleMenu(event, post.id)} className="menu-toggle">
                                 ⋮
                             </button>
                             {openMenus[post.id] && (
