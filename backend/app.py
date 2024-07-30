@@ -4,7 +4,7 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from sqlalchemy import text
 from models import db
-from constants import SQLALCHEMY_DATABASE_URI, SECRET_KEY, JWT_SECRET_KEY, UPLOAD_FOLDER
+from constants import RDS_POSTGRESQL_DATAVASE_URI, SECRET_KEY, JWT_SECRET_KEY, UPLOAD_FOLDER
 from blacklist import blacklist
 import nltk
 from socketio_module import init_socketio, socketio
@@ -16,7 +16,7 @@ def create_app():
     app = Flask(__name__)
     CORS(app, resources={r"/*": {"origins": ["http://localhost:3000", "http://127.0.0.1:3000"]}}, supports_credentials=True)
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
+    app.config['SQLALCHEMY_DATABASE_URI'] = RDS_POSTGRESQL_DATAVASE_URI
     app.config['SECRET_KEY'] = SECRET_KEY
     app.config['JWT_SECRET_KEY'] = JWT_SECRET_KEY
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
