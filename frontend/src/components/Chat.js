@@ -43,12 +43,12 @@ function Chat({ groupCode }) {
         socketRef.current = io('http://127.0.0.1:5000');
 
         socketRef.current.on('connect', () => {
-            console.log('Socket connected');
+            console.log('Socket connected in Chat');
             socketRef.current.emit('join', { groupCode });
         });
 
         socketRef.current.on('connect_error', (error) => {
-            console.error('Socket connection error:', error);
+            console.error('Socket connection error in Chat:', error);
             setError('Failed to connect to chat server. Please try again.');
         });
 
@@ -57,6 +57,7 @@ function Chat({ groupCode }) {
         });
 
         return () => {
+            console.log('Disconnecting Socket in Chat');
             socketRef.current.emit('leave', { groupCode });
             socketRef.current.off('message');
             socketRef.current.disconnect();

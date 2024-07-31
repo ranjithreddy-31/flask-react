@@ -109,7 +109,7 @@ function Comments({ comments, groupCode }) {
                       className="edit-comment-input"
                     />
                     <div className="edit-comment-actions">
-                      <div class="icon-container">
+                      <div className="icon-container">
                       <FontAwesomeIcon 
                         icon={faSave} 
                         className="save-icon"

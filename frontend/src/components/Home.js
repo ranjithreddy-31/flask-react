@@ -20,7 +20,7 @@ const Home = () => {
     return (
         <Layout>
             <div className="home-container">
-            <div class="home-content">
+            <div className="home-content">
                 <h1 className="home-title">Welcome</h1>
                 <p className="home-welcome">Where every chat sparks a connection and every feed tells a story.</p>
                 </div>    

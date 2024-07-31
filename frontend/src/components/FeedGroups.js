@@ -51,6 +51,9 @@ function FeedGroups() {
             console.log('Socket connected in FeedGroups');
         });
 
+        socketRef.current.on('connect_error', (error) => {
+            console.error('Socket connection error in FeedGroups:', error);
+        });
 
         socketRef.current.on('delete_group', ({ groupCode }) => {
             console.log('Deleted')
@@ -64,11 +67,12 @@ function FeedGroups() {
             
         });
         return () => {
-            if (socketRef.current) {
-                socketRef.current.disconnect();
-            }
+            console.log('Disconnecting Socket in FeedGroups');
+            socketRef.current.emit('leave', { groupCode });
+            socketRef.current.off('message');
+            socketRef.current.disconnect();
         };
-    }, [])
+    }, [groupCode]);
 
     useEffect(() => {
         fetchUserGroups();

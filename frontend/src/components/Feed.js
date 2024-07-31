@@ -67,8 +67,12 @@ function Feed() {
         socketRef.current = io('http://127.0.0.1:5000');
 
         socketRef.current.on('connect', () => {
-            console.log('Socket connected');
+            console.log('Socket connected in Feed');
             socketRef.current.emit('join', { groupCode });
+        });
+
+        socketRef.current.on('connect_error', (error) => {
+            console.error('Socket connection error in Feed:', error);
         });
 
         socketRef.current.on('new_feed', (feed) => {
@@ -127,6 +131,14 @@ function Feed() {
                 return post;
             }));
         });
+        return () => {
+            if (socketRef.current) {
+                console.log('Disconnecting Socket in Feed');
+                socketRef.current.emit('leave', { groupCode });
+                socketRef.current.off('message');
+                socketRef.current.disconnect();
+            }
+        };
     }, [groupCode])
 
     useEffect(() => {

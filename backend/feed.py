@@ -1,12 +1,16 @@
-from flask import Blueprint, jsonify, request, current_app, send_from_directory
+from flask import Blueprint, jsonify, request, current_app, send_file
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from models import Feed, Comment, User, Group, db
 import os
+from io import BytesIO
 from werkzeug.utils import secure_filename
 import base64
 from socketio_module import socketio
+from constants import AWS_ACCESS_KEY, AWS_SECRET_KEY, AWS_BUCKET, AWS_FILE_FOLDER, AWS_REGION
+from utils import get_s3_client, upload_file_to_s3, get_file_from_s3
 
 feed_bp = Blueprint('feed', __name__)
+s3_client = get_s3_client(AWS_ACCESS_KEY, AWS_SECRET_KEY, AWS_REGION)
 
 def emit_new_feed(feed, group_code):
     socketio.emit('new_feed', {
@@ -58,14 +62,13 @@ def add_feed():
             # Remove the "data:image/jpeg;base64," part
             photo_data = photo_base64.split(',')[1]
             photo_binary = base64.b64decode(photo_data)
-            
-            filename = secure_filename(f"feed_photo_{new_feed.id}.jpg")
-            filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
-            
-            with open(filepath, 'wb') as f:
-                f.write(photo_binary)
-            
-            new_feed.picture = filename
+            filename = f"feed_photo_{new_feed.id}.jpg"
+            s3_file_name = f"feed_photos/{filename}"
+            s3_url = upload_file_to_s3(s3_client, photo_binary, AWS_BUCKET, s3_file_name)
+            if s3_url:
+                new_feed.picture = filename  # Assuming `picture_url` is a field in Feed model
+            else:
+                return jsonify({'message': 'Failed to upload image to S3'}), 500
 
         db.session.commit()
 
@@ -145,9 +148,17 @@ def update_feed(feedId):
     if 'photo' in request.files:
         photo = request.files['photo']
         if photo:
-            filename = secure_filename(f"feed_photo_{feed.id}_{photo.filename}")
-            photo.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
-            feed.picture = filename
+            # filename = secure_filename(f"feed_photo_{feed.id}.jpg")
+            # photo.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+            # feed.picture = filename
+            photo_binary = photo.read()
+            filename = f"feed_photo_{feed.id}.jpg"
+            s3_file_name = f"feed_photos/{filename}"
+            s3_url = upload_file_to_s3(s3_client, photo_binary, AWS_BUCKET, s3_file_name)
+            if s3_url:
+                feed.picture = filename  
+            else:
+                return jsonify({'message': 'Failed to upload image to S3'}), 500
 
     db.session.commit()
 
@@ -158,7 +169,13 @@ def update_feed(feedId):
 
 @feed_bp.route('/uploads/<filename>', methods=["GET"])
 def uploaded_file(filename):
-    return send_from_directory(current_app.config['UPLOAD_FOLDER'], filename)
+    print(f'Getting file from s3')
+    try:
+        s3_file_name = f"feed_photos/{filename}"
+        image_data =  get_file_from_s3(s3_client, AWS_BUCKET, s3_file_name)
+        return send_file(BytesIO(image_data), mimetype='image/jpeg', as_attachment=True, download_name=filename)
+    except Exception as e:
+        return jsonify({'message': f'Failed to fetch feed picture from s3: {e}'}), 500
 
 @feed_bp.route("/getUserData", methods=["GET"])
 @jwt_required()

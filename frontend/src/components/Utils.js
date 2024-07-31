@@ -230,7 +230,7 @@ export const showFeeds = (
                                 placeholder="Write a comment..."
                                 className="comment-input"
                             />
-                            <div class="icon-container">
+                            <div className="icon-container">
                             <button 
                                 onClick={() => handleAddComment(post.id)} 
                                 className="send-comment-button"
