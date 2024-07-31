@@ -21,7 +21,7 @@ function Chat({ groupCode }) {
             return;
         }
 
-        const fetchCurrentUser = async() =>{
+        const fetchCurrentUser = async () => {
             setCurrentUser(await getCurrentUser());
         }
 
@@ -37,18 +37,19 @@ function Chat({ groupCode }) {
                 setError('Failed to fetch messages. Please try again.');
             }
         };
+
         fetchCurrentUser();
         fetchMessages();
 
         socketRef.current = io('http://127.0.0.1:5000');
 
         socketRef.current.on('connect', () => {
-            console.log('Socket connected in Chat');
+            console.log('Socket connected');
             socketRef.current.emit('join', { groupCode });
         });
 
         socketRef.current.on('connect_error', (error) => {
-            console.error('Socket connection error in Chat:', error);
+            console.error('Socket connection error:', error);
             setError('Failed to connect to chat server. Please try again.');
         });
 
@@ -57,13 +58,17 @@ function Chat({ groupCode }) {
         });
 
         return () => {
-            console.log('Disconnecting Socket in Chat');
             socketRef.current.emit('leave', { groupCode });
             socketRef.current.off('message');
             socketRef.current.disconnect();
         };
     }, [groupCode]);
 
+    useEffect(() => {
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
+    }, [messages]);
 
     const sendChat = async (e) => {
         e.preventDefault();
@@ -87,8 +92,7 @@ function Chat({ groupCode }) {
         }
     };
 
-    const handleUserClick = (username) =>{
-        console.log(username, groupCode)
+    const handleUserClick = (username) => {
         navigate(`/profile/${username}`, { state: { groupCode } });
     }
 
@@ -109,30 +113,19 @@ function Chat({ groupCode }) {
                                         className="chat-user-link"
                                     >
                                         {msg.user.charAt(0).toUpperCase()}
-                                        </button>
+                                    </button>
                                 </strong>
                             </div>
                         )}
                         <div className={`chat-message ${currentUser === msg.user ? 'chat-message-right' : 'chat-message-left'}`}>
-                            {/* {currentUser !== msg.user
-                             && (
-                                <strong>
-                                    <button
-                                        onClick={() => handleUserClick(msg.user)}
-                                        className="chat-user-link"
-                                    >
-                                        {msg.user}: 
-                                    </button>
-                                </strong>
-                            )} */}
-                             {msg.text}
-                             <span className="chat-message-time">
-    {new Date(msg.timestamp).toLocaleDateString([], {
-        day: '2-digit',
-        month: '2-digit',
-        year: '2-digit'
-    })} {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
-</span>
+                            {msg.text}
+                            <span className="chat-message-time">
+                                {new Date(msg.timestamp).toLocaleDateString([], {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: '2-digit'
+                                })} {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
+                            </span>
                         </div>
                     </div>
                 ))}
@@ -149,7 +142,6 @@ function Chat({ groupCode }) {
             </form>
         </div>
     );
-    
 }
 
 export default Chat;
