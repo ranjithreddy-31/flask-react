@@ -294,6 +294,10 @@ function Feed() {
         }
     };
 
+    const handleLike = () =>{
+        console.log('clicked on like');
+    }
+
     return (
         <div className="feed-and-chat-container">
             {error && <h1>{error}</h1>}
@@ -327,6 +331,7 @@ function Feed() {
                         handleUpdatePost,
                         handlePhotoChange,
                         editPhotoPreview,
+                        handleLike,
                         groupCode
                     )}
                 </div>

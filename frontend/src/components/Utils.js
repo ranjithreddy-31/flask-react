@@ -4,7 +4,7 @@ import React from 'react';
 import Comments from './Comments';
 import '../css/Feed.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
+import { faPaperPlane, faHeart, faComment } from '@fortawesome/free-solid-svg-icons';
 
 
 export const isTokenExpired = (token) => {
@@ -103,6 +103,7 @@ export const showFeeds = (
     handleUpdatePost,
     handlePhotoChange,
     editPhotoPreview,
+    handleLike,
     groupCode
 ) => {
     const toggleMenu = (event, postId) => {
@@ -144,6 +145,15 @@ export const showFeeds = (
                             )}
                         </div>
                     </div>
+                    <div className="post-meta">
+                            <span>
+                                By:{' '}
+                                <button onClick={() => handleUserClick(post.created_by)} className="user-link">
+                                    {post.created_by}
+                                </button>{' '}
+                                at {new Date(post.created_at).toLocaleString()}
+                            </span>
+                        </div>
                     {editingPost === post.id ? (
                         <div className="edit-post-container">
                             <form className="edit-post-form" onSubmit={(e) => {
@@ -204,21 +214,17 @@ export const showFeeds = (
                             )}
                         </>
                     )}
-                    <p className="post-meta">
-                        By:{' '}
-                        <button
-                            onClick={() => handleUserClick(post.created_by)}
-                            className="user-link"
-                        >
-                            {post.created_by}
-                        </button>{' '}
-                        at {new Date(post.created_at).toLocaleString()}
-                    </p>
+                    <button onClick={() => handleLike(post.id)} className="action-button like-button">
+                        <FontAwesomeIcon icon={faHeart} />
+                        <span className="action-count">0</span>
+                    </button>
+
                     <button 
                         onClick={() => setOpenComments(prevState => ({...prevState, [post.id]: !prevState[post.id]}))}
-                        className="show-comments-toggle-link"
+                        className="action-button comment-button"
                     >
-                        {openComments[post.id] ? 'Hide Comments' : 'Show Comments'}
+                        <FontAwesomeIcon icon={faComment} />
+                        <span className="action-count">{post.comments.length}</span>
                     </button>
                     {openComments[post.id] && <Comments comments={post.comments} groupCode={groupCode}/>}
                     <div className="comment-input-container">

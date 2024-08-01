@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 import base64
 from socketio_module import socketio
 from constants import AWS_ACCESS_KEY, AWS_SECRET_KEY, AWS_BUCKET, AWS_FILE_FOLDER, AWS_REGION
-from utils import get_s3_client, upload_file_to_s3, get_file_from_s3
+from utils import get_s3_client, upload_file_to_s3, get_file_from_s3, delete_file_from_s3
 
 feed_bp = Blueprint('feed', __name__)
 s3_client = get_s3_client(AWS_ACCESS_KEY, AWS_SECRET_KEY, AWS_REGION)
@@ -148,12 +148,13 @@ def update_feed(feedId):
     if 'photo' in request.files:
         photo = request.files['photo']
         if photo:
-            # filename = secure_filename(f"feed_photo_{feed.id}.jpg")
-            # photo.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
-            # feed.picture = filename
             photo_binary = photo.read()
             filename = f"feed_photo_{feed.id}.jpg"
             s3_file_name = f"feed_photos/{filename}"
+            # Below code is not required at the moment
+            # response = delete_file_from_s3(s3_client, AWS_BUCKET, s3_file_name)
+            # if not response:
+            #     print('Failed to delete file')
             s3_url = upload_file_to_s3(s3_client, photo_binary, AWS_BUCKET, s3_file_name)
             if s3_url:
                 feed.picture = filename  
