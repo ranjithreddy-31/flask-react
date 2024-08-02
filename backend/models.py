@@ -19,6 +19,7 @@ class User(db.Model):
     comments = db.relationship('Comment', backref='author', lazy=True, cascade="all, delete-orphan")
     groups = db.relationship('Group', secondary=user_group, back_populates='members', lazy='dynamic')
     messages = db.relationship('ChatMessage', backref='author', lazy=True, cascade="all, delete-orphan")
+    likes = db.relationship('Like', backref='user', lazy=True, cascade="all, delete-orphan")
 
 class TodoItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -45,6 +46,7 @@ class Feed(db.Model):
     group_id = db.Column(db.Integer, db.ForeignKey('group.id', ondelete='CASCADE'), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     comments = db.relationship('Comment', backref='post', lazy=True, cascade="all, delete-orphan")
+    likes = db.relationship('Like', backref='feed', lazy=True, cascade="all, delete-orphan")
 
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -59,4 +61,9 @@ class ChatMessage(db.Model):
     group_id = db.Column(db.Integer, db.ForeignKey('group.id', ondelete='CASCADE'), nullable=False)
     message = db.Column(db.String(500), nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    
+
+class Like(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
+    feed_id = db.Column(db.Integer, db.ForeignKey('feed.id', ondelete='CASCADE'), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)

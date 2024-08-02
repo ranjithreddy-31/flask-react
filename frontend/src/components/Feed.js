@@ -131,6 +131,18 @@ function Feed() {
                 return post;
             }));
         });
+
+        socketRef.current.on('like_feed', ({ feed_id, like_count, groupCode }) => {
+            setPosts((prevPosts) => prevPosts.map(post => {
+                if (post.id === feed_id) {
+                    return {
+                        ...post,
+                        likes: like_count
+                    };
+                }
+                return post;
+            }));
+        });
         return () => {
             if (socketRef.current) {
                 console.log('Disconnecting Socket in Feed');
@@ -294,9 +306,22 @@ function Feed() {
         }
     };
 
-    const handleLike = () =>{
-        console.log('clicked on like');
-    }
+    const handleLike = async (feed_id) => {
+        try {
+          const token = localStorage.getItem('token');
+          await axios.post('http://127.0.0.1:5000/toggleLike', 
+            { feed_id: feed_id, group_code:groupCode },
+            {
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              }
+            }
+          );
+        } catch (error) {
+          console.error('Error toggling like:', error);
+        }
+      };
 
     return (
         <div className="feed-and-chat-container">

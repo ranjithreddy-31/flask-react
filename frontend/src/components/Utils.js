@@ -216,7 +216,7 @@ export const showFeeds = (
                     )}
                     <button onClick={() => handleLike(post.id)} className="action-button like-button">
                         <FontAwesomeIcon icon={faHeart} />
-                        <span className="action-count">0</span>
+                        <span className="action-count">{post.likes}</span>
                     </button>
 
                     <button 

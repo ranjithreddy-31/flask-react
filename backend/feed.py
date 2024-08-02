@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request, current_app, send_file
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from models import Feed, Comment, User, Group, db
+from models import Feed, Comment, User, Group, Like, db
 import os
 from io import BytesIO
 from werkzeug.utils import secure_filename
@@ -37,6 +37,14 @@ def emit_update_feed(feed, group_code):
         'created_at': feed.created_at.isoformat(),
         'groupCode': group_code
     }, room=group_code)
+
+def emit_like(feed_id, like_count, group_code):
+    socketio.emit('like_feed', {
+        'feed_id': feed_id,
+        'like_count': like_count,
+        'groupCode': group_code
+    }, room=group_code)
+
 
 @feed_bp.route('/addFeed', methods=['POST'])
 @jwt_required()
@@ -216,6 +224,27 @@ def getUserData():
     except Exception as e:
         return jsonify({'message': f'Failed to fetch user data: {e}'}), 500
 
+@feed_bp.route('/toggleLike', methods=['POST'])
+@jwt_required()
+def toggle_like():
+    current_user = get_jwt_identity()
+    data = request.get_json()
+    feed_id = data.get('feed_id')
+    group_code = data.get('group_code')
+    like = Like.query.filter_by(user_id=current_user, feed_id=feed_id).first()
+    
+    if like:
+        db.session.delete(like)
+    else:
+        new_like = Like(user_id=current_user, feed_id=feed_id)
+        db.session.add(new_like)
+    
+    db.session.commit()
+    
+    like_count = Like.query.filter_by(feed_id=feed_id).count()
+    emit_like(feed_id, like_count, group_code)
+    return jsonify({'success': True, 'likeCount': like_count})
+
 def jsonify_feeds(pagination):
     all_feeds_list = []
     for feed in pagination.items:
@@ -234,6 +263,7 @@ def jsonify_feeds(pagination):
             'picture': feed.picture,
             'created_by': feed.creator.username,
             'created_at': feed.created_at,
+            'likes': Like.query.filter_by(feed_id=feed.id).count(),
             'comments': comment_list
         }
         all_feeds_list.append(feed_data)
@@ -244,3 +274,4 @@ def jsonify_feeds(pagination):
         'pages': pagination.pages,
         'current_page': 1
     })
+    
