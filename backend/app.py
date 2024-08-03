@@ -3,7 +3,7 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from sqlalchemy import text
-from models import db
+from models import User, db
 from constants import RDS_POSTGRESQL_DATAVASE_URI, SECRET_KEY, JWT_SECRET_KEY, UPLOAD_FOLDER
 from blacklist import blacklist
 import nltk
@@ -11,6 +11,17 @@ from socketio_module import init_socketio, socketio
 
 # Initialize the punkt tokenizer data
 nltk.download('punkt')
+
+# Register Blueprints
+from auth import auth_bp, create_anonymous_user
+from feed import feed_bp
+from comment import comment_bp
+from todo import todo_bp
+from scraper import scraper_bp
+from weather import weather_bp
+from calculator import calculator_bp
+from group import group_bp
+from chat import chat_bp
 
 def create_app():
     app = Flask(__name__)
@@ -32,6 +43,12 @@ def create_app():
 
     with app.app_context():
         db.create_all()
+        anonymous_user = User.query.filter_by(username='anonymous').first()
+        if not anonymous_user:
+            create_anonymous_user()
+            print("Anonymous user created.")
+        else:
+            print("Anonymous user already exists.")
 
     @app.before_request
     def enforce_foreign_keys():
@@ -44,16 +61,6 @@ app = create_app()
 init_socketio(app)
 jwt = JWTManager(app)
 
-# Register Blueprints
-from auth import auth_bp
-from feed import feed_bp
-from comment import comment_bp
-from todo import todo_bp
-from scraper import scraper_bp
-from weather import weather_bp
-from calculator import calculator_bp
-from group import group_bp
-from chat import chat_bp
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(feed_bp)

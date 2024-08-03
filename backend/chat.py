@@ -24,16 +24,20 @@ def get_group_messages(groupCode):
 def send_group_message(groupCode):
     try:
         data = request.json
-        user_id = get_jwt_identity()
-        
+        message_content = data.get('content','').strip()
         group = Group.query.filter_by(code=groupCode).first()
         if not group:
             return jsonify({'error': 'Group not found'}), 404
-        
-        message = ChatMessage(user_id=user_id, group_id=group.id, message=data['content'])
+        if message_content.startswith('@anonymous'):
+            message_content = message_content.lstrip('@anonymous')
+            user = User.query.filter_by(username='anonymous').first()
+        else:
+            current_user_id = get_jwt_identity()
+            user = User.query.get(current_user_id)
+
+        message = ChatMessage(user_id=user.id, group_id=group.id, message=message_content)
         db.session.add(message)
         db.session.commit()
-        user = User.query.get(user_id)
         message = {
         'user': user.username,
         'text': message.message,

@@ -64,3 +64,12 @@ def get_user(username):
         return jsonify(user_data), 200
     else:
         return jsonify({'message': 'User not found'}), 404
+
+def create_anonymous_user():
+    anonymous_user = User(
+        username='anonymous',
+        email='anonymous@example.com',
+        password=bcrypt.generate_password_hash('anonymous_password').decode('utf-8')
+        )
+    db.session.add(anonymous_user)
+    db.session.commit()

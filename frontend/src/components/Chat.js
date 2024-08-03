@@ -64,6 +64,11 @@ function Chat({ groupCode }) {
         };
     }, [groupCode]);
 
+    useEffect(() => {
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
+    }, [messages]);
 
     const sendChat = async (e) => {
         e.preventDefault();
@@ -127,12 +132,12 @@ function Chat({ groupCode }) {
                             )} */}
                              {msg.text}
                              <span className="chat-message-time">
-    {new Date(msg.timestamp).toLocaleDateString([], {
-        day: '2-digit',
-        month: '2-digit',
-        year: '2-digit'
-    })} {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
-</span>
+                                {new Date(msg.timestamp).toLocaleDateString([], {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: '2-digit'
+                                })} {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
+                            </span>
                         </div>
                     </div>
                 ))}
