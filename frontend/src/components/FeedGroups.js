@@ -19,6 +19,8 @@ function FeedGroups() {
     const [editingGroup, setEditingGroup] = useState(null);
     const [editGroupName, setEditGroupName] = useState('');
     const [refreshTrigger, setRefreshTrigger] = useState(0);
+    const [activeGroup, setActiveGroup] = useState(null);
+    const [hoveredGroup, setHoveredGroup] = useState(null);
     const socketRef = useRef();
     const menuRef = useRef();
 
@@ -56,7 +58,6 @@ function FeedGroups() {
         });
 
         socketRef.current.on('delete_group', ({ groupCode }) => {
-            console.log('Deleted')
             setUserGroups((prevGroups) => prevGroups.filter(group => group.code !== groupCode));
         });
 
@@ -94,7 +95,6 @@ function FeedGroups() {
     }, [fetchUserGroups, refreshTrigger]);
 
     const joinGroupRoom = (groupCode) => {
-        console.log(`Joining room ${groupCode}`)
         socketRef.current.emit('join', { groupCode });
     };
 
@@ -230,6 +230,11 @@ function FeedGroups() {
         }
     };
 
+    const handleAboutGroup = (groupCode) =>{
+        console.log(`About Group ${groupCode}`)
+        navigate(`/about/${groupCode}`);
+    }
+
     return (
         <div className="feed-groups-container">
             <h2 className="feed-groups-title">Your Groups</h2>
@@ -289,7 +294,10 @@ function FeedGroups() {
             <div className="feed-groups-list">
                 {userGroups.length > 0 ? (
                     userGroups.map((group) => (
-                        <div key={group.code} className="feed-group-item" onClick={() => joinGroupRoom(group.code)}>
+                        <div key={group.code} 
+                            className={`feed-group-item ${activeGroup === group.code ? 'active' : ''}`} 
+                            onClick={() => joinGroupRoom(group.code)}
+                        >
                             {editingGroup === group.code ? (
                                 <form className="edit-post-form" onSubmit={(e) => {
                                     e.preventDefault();
@@ -312,13 +320,26 @@ function FeedGroups() {
                                     </div>
                                 </form>
                             ) : (
-                                <Link to={`/feed/${group.code}`} className="feed-group-link">
-                                    <div className="feed-group-avatar">{getGroupInitials(group.name)}</div>
-                                    <div className="feed-group-info">
+                                <Link 
+                                    to={`/feed/${group.code}`} 
+                                    className="feed-group-link"
+                                    onClick={() => setActiveGroup(group.code)}
+                                    onMouseEnter={() => setHoveredGroup(group.code)}
+                                    onMouseLeave={() => setHoveredGroup(null)}
+                                    key={group.code}
+                              >
+                                    
+                                    <div className={`feed-group-avatar ${activeGroup === group.code ? 'active' : ''}`}>{getGroupInitials(group.name)}</div>
+                                    <div className={`feed-group-info ${activeGroup === group.code ? 'active' : ''}`}>
                                         <h3>{group.name}</h3>
                                         <p>{group.code}</p>
                                     </div>
                                 </Link>
+                            )}
+                            { hoveredGroup === group.code && (
+                                    <div className="group-description-popup">
+                                        <p>{group.description}</p>
+                                    </div>
                             )}
                             <div className="group-menu" ref={menuRef}>
                                 <button onClick={(event) => toggleMenu(event, group.code)} className="menu-toggle">
@@ -342,6 +363,11 @@ function FeedGroups() {
                                             onClick={() => handleLeaveGroup(group.code)} 
                                         >
                                             Leave
+                                        </button>
+                                        <button 
+                                            onClick={() => handleAboutGroup(group.code)} 
+                                        >
+                                            About
                                         </button>
                                     </div>
                                 )}

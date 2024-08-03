@@ -13,6 +13,7 @@ import UserProfile from './components/UserProfile';
 import FeedGroups from './components/FeedGroups';
 import FeedMainLayout from './components/FeedMainLayout';
 import Chat from './components/Chat';
+import AboutGroup from './components/AboutGroup';
 
 const App = () => {
   return (
@@ -30,6 +31,9 @@ const App = () => {
         <Route path="/feedgroups" element={<PrivateRoute><FeedGroups /></PrivateRoute>} />
         <Route path="/feed" element={<PrivateRoute><FeedMainLayout /></PrivateRoute>}>
           <Route path=":groupCode" element={<Feed />} />
+        </Route>
+        <Route path="/about" element={<PrivateRoute><FeedMainLayout /></PrivateRoute>}>
+          <Route path=":groupCode" element={<AboutGroup/>} />
         </Route>
         <Route path="/chat" element={<PrivateRoute><Chat /></PrivateRoute>} />
       </Routes>

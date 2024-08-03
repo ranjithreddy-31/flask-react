@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import io from 'socket.io-client';
 import { isTokenExpired, getUserProfile, showFeeds, deletePost, updateFeed, getCurrentUser } from './Utils';
 import Layout from './Layout';
 import '../css/Feed.css';
@@ -22,12 +23,100 @@ function UserProfile() {
     const navigate = useNavigate();
     const location = useLocation();
     const [groupCode, setGroupCode] = useState(location.state?.groupCode || null);
+    const [posts, setPosts] = useState([]);
+    const socketRef = useRef();
+
+    useEffect(()=>{
+        socketRef.current = io('http://127.0.0.1:5000');
+
+        socketRef.current.on('connect', () => {
+            console.log('Socket connected in User Profile');
+            socketRef.current.emit('join', { groupCode });
+        });
+
+        socketRef.current.on('connect_error', (error) => {
+            console.error('Socket connection error in User Profile:', error);
+        });
+
+        socketRef.current.on('new_feed', (feed) => {
+            setPosts((prevPosts) => [feed, ...prevPosts]);
+        });
+
+        socketRef.current.on('delete_feed', ({ feed_id }) => {
+            setPosts((prevPosts) => prevPosts.filter(post => post.id !== feed_id));
+        });
+
+        socketRef.current.on('update_feed', (updatedFeed) => {
+            setPosts((prevPosts) => prevPosts.map(post => 
+            post.id === updatedFeed.id ? updatedFeed : post
+            ));
+        });
+
+        socketRef.current.on('new_comment', ({ feed_id, comment }) => {
+            setPosts((prevPosts) => prevPosts.map(post => {
+                if (post.id === feed_id) {
+                    return {
+                        ...post,
+                        comments: [...post.comments, comment]
+                    };
+                }
+                return post;
+            }));
+        });
+
+        socketRef.current.on('update_comment', ({ feed_id, comment }) => {
+            setPosts(prevPosts => prevPosts.map(post => {
+              if (post.id === feed_id) {
+                return {
+                  ...post,
+                  comments: post.comments.map(c => 
+                    c.id === comment.id ? { ...c, ...comment } : c
+                  )
+                };
+              }
+              return post;
+            }));
+          });
+          
+        socketRef.current.on('delete_comment', ({ feed_id, comment_id }) => {
+            setPosts((prevPosts) => prevPosts.map(post => {
+                if (post.id === feed_id) {
+                    return {
+                        ...post,
+                        comments: post.comments.filter(comment => comment.id !== comment_id)
+                    };
+                }
+                return post;
+            }));
+        });
+
+        socketRef.current.on('like_feed', ({ feed_id, like_count, groupCode }) => {
+            setPosts((prevPosts) => prevPosts.map(post => {
+                if (post.id === feed_id) {
+                    return {
+                        ...post,
+                        likes: like_count
+                    };
+                }
+                return post;
+            }));
+        });
+        return () => {
+            if (socketRef.current) {
+                console.log('Disconnecting Socket in User Profile');
+                socketRef.current.emit('leave', { groupCode });
+                socketRef.current.off('message');
+                socketRef.current.disconnect();
+            }
+        };
+    }, [groupCode])
 
     useEffect(() => {
         const fetchUserProfile = async () => {
             try {
                 const userData = await getUserProfile(username, groupCode);
                 setUser(userData.user);
+                setPosts(userData.user.feeds);
             } catch (err) {
                 setError(err.message);
                 if (err.message === 'Token expired') {
@@ -154,6 +243,23 @@ function UserProfile() {
         setRefreshTrigger(prev => prev + 1);
     };
 
+    const handleLike = async (feed_id) => {
+        try {
+          const token = localStorage.getItem('token');
+          await axios.post('http://127.0.0.1:5000/toggleLike', 
+            { feed_id: feed_id, group_code:groupCode },
+            {
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              }
+            }
+          );
+        } catch (error) {
+          console.error('Error toggling like:', error);
+        }
+      };
+
     if (error) return <div className="alert alert-danger">Error: {error}</div>;
     if (!user) return <div className="alert alert-info">Loading...</div>;
 
@@ -167,9 +273,10 @@ function UserProfile() {
                 </div>
                 <div className="feed-container">
                     <h2>Feeds</h2>
-                    {user.feeds && user.feeds.length > 0 ? (
+                    {}
+                    {posts && posts.length > 0 ? (
                         showFeeds(
-                            user.feeds,
+                            posts,
                             true, // isAuthorized
                             openComments,
                             setOpenComments,
@@ -194,6 +301,7 @@ function UserProfile() {
                             handleUpdatePost,
                             handlePhotoChange,
                             editPhotoPreview,
+                            handleLike,
                             groupCode
                         )
                     ) : (

@@ -91,7 +91,14 @@ function Feed() {
 
         socketRef.current.on('delete_group', ({ groupCode }) => {
             setPosts([]);
+            navigate('/feed');
             setError("Group doesn't exist or deleted by Admin")
+        });
+
+        socketRef.current.on('leave_group', ({ groupCode }) => {
+            setPosts([]);
+            navigate('/feed');
+            setError("Error fetching posts: You are currently not part of this group")
         });
 
         socketRef.current.on('new_comment', ({ feed_id, comment }) => {
@@ -151,7 +158,7 @@ function Feed() {
                 socketRef.current.disconnect();
             }
         };
-    }, [groupCode])
+    }, [groupCode, navigate])
 
     useEffect(() => {
         fetchPosts();

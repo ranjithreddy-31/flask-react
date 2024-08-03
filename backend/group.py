@@ -8,8 +8,10 @@ group_bp = Blueprint('group', __name__)
 
 
 def emit_delete_group(groupCode):
-    print(f"Delete group emit {groupCode}")
     socketio.emit('delete_group', {'groupCode': groupCode}, room=groupCode)
+
+def emit_leave_group(groupCode):
+    socketio.emit('leave_group', {'groupCode': groupCode}, room=groupCode)
 
 def emit_update_group(group, group_code):
     print(f"Update Group emit {group_code}")
@@ -122,7 +124,7 @@ def leave_group():
         group = Group.query.filter_by(code=group_code).first()
         user.groups.remove(group)
         db.session.commit()
-
+        emit_leave_group(group_code)
         return jsonify({"message": "User left the group successfully"}), 200
     except Exception as e:
         return jsonify({"message": f"Failed to remove user from the group with {e}"}), 500
@@ -141,3 +143,25 @@ def delete_group(group_code):
         return jsonify({"message": "Deleted the group successfully"}), 200
     except Exception as e:
         return jsonify({"message": f"Failed to delete the group with {e}"}), 500
+
+@group_bp.route('/about/<string:group_code>', methods=['GET'])
+@jwt_required()
+def about_group(group_code):
+    try:
+        group = Group.query.filter_by(code=group_code).first()
+        if not group:
+            return jsonify({"error": "Group not found"}), 404
+
+        members = [{"id": member.id, "username": member.username} for member in group.members]
+        
+        group_info = {
+            'id': group.id,
+            'name': group.name,
+            'code': group.code,
+            'description': group.description,
+            'created_by': User.query.get(group.created_by).username,
+            'members': members
+        }
+        return jsonify({"group": group_info}), 200
+    except Exception as e:
+        return jsonify({"error": f"An unexpected error occurred: {e}"}), 500
