@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import '../css/Login.css';
+import config from '../config';
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -15,7 +16,7 @@ const Login = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            const response = await axios.post("http://127.0.0.1:5000/login", {
+            const response = await axios.post(`${config.API_URL}/login`, {
                 username, password
             });
             localStorage.setItem('token', response.data.access_token);

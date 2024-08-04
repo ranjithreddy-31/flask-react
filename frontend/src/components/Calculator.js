@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Layout from './Layout';
 import { isTokenExpired } from './Utils';
+import config from '../config';
 
 function Calculator() {
     const navigate = useNavigate();
@@ -16,7 +17,7 @@ function Calculator() {
             if(isTokenExpired(token)){
                 navigate('/login');
             }
-            const response = await axios.post("http://127.0.0.1:5000/getResultForExpression", {
+            const response = await axios.post(`${config.API_URL}/getResultForExpression`, {
                 expression: expression
             }, {
                 headers: {

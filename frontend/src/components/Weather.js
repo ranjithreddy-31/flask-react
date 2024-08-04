@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from './Layout';
 import axios from 'axios';  
+import config from '../config';
 
 import { isTokenExpired } from './Utils';
 
@@ -19,7 +20,7 @@ function Weather() {
                 if(isTokenExpired(token)){
                     navigate('/login');
                 }
-                const response = await axios.post('http://127.0.0.1:5000/getWeather', 
+                const response = await axios.post(`${config.API_URL}/getWeather`, 
                     { city: location },
                     {
                         headers: {

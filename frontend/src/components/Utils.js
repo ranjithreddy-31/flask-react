@@ -1,10 +1,11 @@
 import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
 import React from 'react';
-import Comments from './Comments';
-import '../css/Feed.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperPlane, faHeart, faComment } from '@fortawesome/free-solid-svg-icons';
+import config from '../config';
+import Comments from './Comments';
+import '../css/Feed.css';
 
 
 export const isTokenExpired = (token) => {
@@ -35,7 +36,7 @@ export const getUserProfile = async (username, groupCode) => {
         if (isTokenExpired(token)) {
             throw new Error('Token expired');
         }
-        const response = await axios.get('http://127.0.0.1:5000/getUserData', {
+        const response = await axios.get(`${config.API_URL}/getUserData`, {
             params: {
                 username: username,
                 groupCode: groupCode
@@ -59,7 +60,7 @@ export const getCurrentUser = async() =>{
             throw new Error('Token expired');
         }
         const response = await axios.get(
-          'http://127.0.0.1:5000/getCurrentUser',
+          `${config.API_URL}/getCurrentUser`,
           {
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -206,7 +207,7 @@ export const showFeeds = (
                             {post.picture && isAuthorized && (
                                 <div className="post-image-container">
                                     <img 
-                                        src={`http://127.0.0.1:5000/uploads/${post.picture}`} 
+                                        src={`${config.API_URL}/uploads/${post.picture}`} 
                                         alt="Post" 
                                         className="post-image"
                                     />
@@ -262,7 +263,7 @@ export const showFeeds = (
 
 export const deletePost = async(postId, token) => {
     try{
-        await axios.delete('http://127.0.0.1:5000/deleteFeed', {
+        await axios.delete(`${config.API_URL}/deleteFeed`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
@@ -280,7 +281,7 @@ export const deletePost = async(postId, token) => {
 
 export const updateFeed = async (postId, formData, token) => {
     try {
-        const response = await axios.put(`http://127.0.0.1:5000/updateFeed/${postId}`, 
+        const response = await axios.put(`${config.API_URL}/updateFeed/${postId}`, 
             formData,
             {
                 headers: {

@@ -1,7 +1,8 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import io from 'socket.io-client';
+import React, { useEffect, useState, useRef } from 'react';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import config from '../config';
 import { isTokenExpired, getUserProfile, showFeeds, deletePost, updateFeed, getCurrentUser } from './Utils';
 import Layout from './Layout';
 import '../css/Feed.css';
@@ -27,7 +28,7 @@ function UserProfile() {
     const socketRef = useRef();
 
     useEffect(()=>{
-        socketRef.current = io('http://127.0.0.1:5000');
+        socketRef.current = io(`${config.API_URL}`);
 
         socketRef.current.on('connect', () => {
             console.log('Socket connected in User Profile');
@@ -167,7 +168,7 @@ function UserProfile() {
                 navigate('/login');
                 return;
             }
-            await axios.post('http://127.0.0.1:5000/addComment', {
+            await axios.post(`${config.API_URL}/addComment`, {
                 feed_id: feedId,
                 comment: comments[feedId]
             }, {
@@ -191,7 +192,7 @@ function UserProfile() {
         setEditHeading(heading);
         setEditContent(content);
         setEditPhoto(photo);
-        setEditPhotoPreview(photo ? `http://127.0.0.1:5000/uploads/${photo}` : null);
+        setEditPhotoPreview(photo ? `${config.API_URL}/uploads/${photo}` : null);
     };
 
     const handlePhotoChange = (event) => {
@@ -246,7 +247,7 @@ function UserProfile() {
     const handleLike = async (feed_id) => {
         try {
           const token = localStorage.getItem('token');
-          await axios.post('http://127.0.0.1:5000/toggleLike', 
+          await axios.post(`${config.API_URL}/toggleLike`, 
             { feed_id: feed_id, group_code:groupCode },
             {
               headers: {

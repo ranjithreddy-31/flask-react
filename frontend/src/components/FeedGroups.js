@@ -1,12 +1,14 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useParams } from 'react-router-dom';
 import io from 'socket.io-client';
 import axios from 'axios';
 import { getCurrentUser, isTokenExpired } from './Utils';
 import '../css/FeedGroups.css';
+import config from '../config';
 
 function FeedGroups() {
     const navigate = useNavigate();
+    const { groupCode: initialGroupCode } = useParams();
     const [groupName, setGroupName] = useState('');
     const [groupCode, setGroupCode] = useState('');
     const [newGroupCode, setNewGroupCode] = useState('');
@@ -19,8 +21,8 @@ function FeedGroups() {
     const [editingGroup, setEditingGroup] = useState(null);
     const [editGroupName, setEditGroupName] = useState('');
     const [refreshTrigger, setRefreshTrigger] = useState(0);
-    const [activeGroup, setActiveGroup] = useState(null);
-    const [hoveredGroup, setHoveredGroup] = useState(null);
+    const [activeGroup, setActiveGroup] = useState(initialGroupCode);
+    // const [hoveredGroup, setHoveredGroup] = useState(null);
     const socketRef = useRef();
     const menuRef = useRef();
 
@@ -32,7 +34,7 @@ function FeedGroups() {
                 navigate('/login');
                 return;
             }
-            const response = await axios.get(`http://127.0.0.1:5000/user/groups`, {
+            const response = await axios.get(`${config.API_URL}/user/groups`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setUserGroups(response.data.groups);
@@ -47,7 +49,7 @@ function FeedGroups() {
     };
 
     useEffect(() =>{
-        socketRef.current = io('http://127.0.0.1:5000');
+        socketRef.current = io(`${config.API_URL}`);
 
         socketRef.current.on('connect', () => {
             console.log('Socket connected in FeedGroups');
@@ -107,7 +109,7 @@ function FeedGroups() {
                 navigate('/login');
                 return;
             }
-            const response = await axios.post("http://127.0.0.1:5000/createGroup", 
+            const response = await axios.post(`${config.API_URL}/createGroup`, 
                 { groupName, aboutGroup },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -132,7 +134,7 @@ function FeedGroups() {
                 navigate('/login');
                 return;
             }
-            const response = await axios.post(`http://127.0.0.1:5000/joinGroup`,
+            const response = await axios.post(`${config.API_URL}/joinGroup`,
                 { groupCode },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -141,6 +143,7 @@ function FeedGroups() {
                 fetchUserGroups();
                 setActiveForm(null); // Close the form after successful join
                 joinGroupRoom(groupCode); // Join the socket room
+                setActiveGroup(groupCode);
                 navigate(`/feed/${groupCode}`);
             }
         } catch (error) {
@@ -182,7 +185,7 @@ function FeedGroups() {
                 navigate('/login');
                 return;
             }
-            await axios.delete(`http://127.0.0.1:5000/group/${groupCode}`, {
+            await axios.delete(`${config.API_URL}/group/${groupCode}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             // The backend will emit the 'delete_group' event
@@ -199,7 +202,7 @@ function FeedGroups() {
                 navigate('/login');
                 return;
             }
-            await axios.post(`http://127.0.0.1:5000/leaveGroup`, 
+            await axios.post(`${config.API_URL}/leaveGroup`, 
                 { groupCode },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -217,7 +220,7 @@ function FeedGroups() {
                 navigate('/login');
                 return;
             }
-            await axios.put(`http://127.0.0.1:5000/group/${groupCode}`, 
+            await axios.put(`${config.API_URL}/group/${groupCode}`, 
                 { groupName: editGroupName },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -230,10 +233,9 @@ function FeedGroups() {
         }
     };
 
-    const handleAboutGroup = (groupCode) =>{
-        console.log(`About Group ${groupCode}`)
-        navigate(`/about/${groupCode}`);
-    }
+    const handleAboutGroup = (groupCode) => {
+        navigate(`/feed/${groupCode}/about`);
+    };
 
     return (
         <div className="feed-groups-container">
@@ -296,7 +298,10 @@ function FeedGroups() {
                     userGroups.map((group) => (
                         <div key={group.code} 
                             className={`feed-group-item ${activeGroup === group.code ? 'active' : ''}`} 
-                            onClick={() => joinGroupRoom(group.code)}
+                            onClick={() => {
+                                setActiveGroup(group.code);
+                                joinGroupRoom(group.code);
+                            }}
                         >
                             {editingGroup === group.code ? (
                                 <form className="edit-post-form" onSubmit={(e) => {
@@ -323,9 +328,11 @@ function FeedGroups() {
                                 <Link 
                                     to={`/feed/${group.code}`} 
                                     className="feed-group-link"
-                                    onClick={() => setActiveGroup(group.code)}
-                                    onMouseEnter={() => setHoveredGroup(group.code)}
-                                    onMouseLeave={() => setHoveredGroup(null)}
+                                    onClick={() => {
+                                        setActiveGroup(group.code);
+                                    }}
+                                    // onMouseEnter={() => setHoveredGroup(group.code)}
+                                    // onMouseLeave={() => setHoveredGroup(null)}
                                     key={group.code}
                               >
                                     
@@ -336,13 +343,13 @@ function FeedGroups() {
                                     </div>
                                 </Link>
                             )}
-                            { hoveredGroup === group.code && (
+                            {/* { hoveredGroup === group.code && (
                                     <div className="group-description-popup">
                                         <p>{group.description}</p>
                                     </div>
-                            )}
+                            )} */}
                             <div className="group-menu" ref={menuRef}>
-                                <button onClick={(event) => toggleMenu(event, group.code)} className="menu-toggle">
+                                <button onClick={(event) => toggleMenu(event, group.code)} className={`menu-toggle ${activeGroup === group.code ? 'active' : ''}`}>
                                     ⋮
                                 </button>
                                 {openMenus[group.code] && (
@@ -365,7 +372,7 @@ function FeedGroups() {
                                             Leave
                                         </button>
                                         <button 
-                                            onClick={() => handleAboutGroup(group.code)} 
+                                            onClick={() => handleAboutGroup(group.code)}
                                         >
                                             About
                                         </button>

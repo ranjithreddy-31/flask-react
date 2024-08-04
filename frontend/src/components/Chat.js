@@ -4,6 +4,7 @@ import io from 'socket.io-client';
 import { getCurrentUser, isTokenExpired } from './Utils';
 import { useNavigate } from 'react-router-dom';
 import '../css/Chat.css';
+import config from '../config';
 
 function Chat({ groupCode }) {
     const [messages, setMessages] = useState([]);
@@ -27,7 +28,7 @@ function Chat({ groupCode }) {
 
         const fetchMessages = async () => {
             try {
-                const response = await axios.get(`http://127.0.0.1:5000/group/${groupCode}/messages`, {
+                const response = await axios.get(`${config.API_URL}/group/${groupCode}/messages`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setMessages(response.data.messages);
@@ -40,7 +41,7 @@ function Chat({ groupCode }) {
         fetchCurrentUser();
         fetchMessages();
 
-        socketRef.current = io('http://127.0.0.1:5000');
+        socketRef.current = io(`${config.API_URL}`);
 
         socketRef.current.on('connect', () => {
             console.log('Socket connected in Chat');
@@ -79,7 +80,7 @@ function Chat({ groupCode }) {
                     setError('Session expired. Please log in again.');
                     return;
                 }
-                await axios.post(`http://127.0.0.1:5000/group/${groupCode}/messages`, 
+                await axios.post(`${config.API_URL}/group/${groupCode}/messages`, 
                     { content: newMessage },
                     { headers: { Authorization: `Bearer ${token}` } }
                 );

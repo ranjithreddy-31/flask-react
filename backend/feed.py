@@ -28,6 +28,8 @@ def emit_delete_feed(feed_id, group_code):
     socketio.emit('delete_feed', {'feed_id': feed_id}, room=group_code)
 
 def emit_update_feed(feed, group_code):
+    serialized_comments = [serialize_comment(comment) for comment in feed.comments]
+
     socketio.emit('update_feed', {
         'id': feed.id,
         'heading': feed.heading,
@@ -35,6 +37,7 @@ def emit_update_feed(feed, group_code):
         'picture': feed.picture,
         'created_by': User.query.get(feed.created_by).username,
         'created_at': feed.created_at.isoformat(),
+        'comments': serialized_comments,
         'groupCode': group_code
     }, room=group_code)
 
@@ -274,4 +277,13 @@ def jsonify_feeds(pagination):
         'pages': pagination.pages,
         'current_page': 1
     })
+
+def serialize_comment(comment):
+    return {
+        'id': comment.id,
+        'comment': comment.comment,
+        'added_by': comment.author.username,
+        'added_at': comment.added_at.isoformat()
+    }
+
     

@@ -1,5 +1,6 @@
 // auth.js
 import axios from 'axios';
+import config from '../config';
 import { isTokenExpired } from './Utils';
 
 export const logout = async () => {
@@ -8,7 +9,7 @@ export const logout = async () => {
         if (isTokenExpired(token)){
             return true;
         }
-        await axios.post('http://127.0.0.1:5000/logout', {}, {
+        await axios.post(`${config.API_URL}/logout`, {}, {
             headers: {
                 Authorization: `Bearer ${token}`
             }

@@ -198,6 +198,10 @@
     padding: 5px 10px;
 }
 
+.menu-toggle.active {
+    color: #ffffff;
+}
+
 .menu-dropdown {
     position: absolute;
     right: 0;

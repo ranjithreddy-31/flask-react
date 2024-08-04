@@ -1,7 +1,8 @@
 // Register.js
-import React, { useState } from 'react';
 import axios from 'axios';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import config from '../config';
 import '../css/Register.css';
 
 const Register = () => {
@@ -15,7 +16,7 @@ const Register = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            const response = await axios.post("http://127.0.0.1:5000/register", {
+            const response = await axios.post(`${config.API_URL}/register`, {
                 username, email, password
             });
             setMessage(response.data.message);

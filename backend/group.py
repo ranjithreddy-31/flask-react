@@ -160,6 +160,7 @@ def about_group(group_code):
             'code': group.code,
             'description': group.description,
             'created_by': User.query.get(group.created_by).username,
+            'created_at': group.created_at,
             'members': members
         }
         return jsonify({"group": group_info}), 200

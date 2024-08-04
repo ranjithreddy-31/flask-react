@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Layout from './Layout';
 import { isTokenExpired } from './Utils';
+import config from '../config';
 
 function TodoList() {
     const navigate = useNavigate();
@@ -16,7 +17,7 @@ function TodoList() {
                 if(isTokenExpired(token)){
                     navigate('/login');
                 }
-                const response = await axios.get("http://127.0.0.1:5000/getAllItems", {
+                const response = await axios.get(`${config.API_URL}/getAllItems`, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
@@ -52,7 +53,7 @@ function TodoList() {
             if(isTokenExpired(token)){
                 navigate('/login');
             }
-            const response = await axios.post("http://127.0.0.1:5000/addTodoItem", {
+            const response = await axios.post(`${config.API_URL}/addTodoItem`, {
                 item: inputValue
             }, {
                 headers: {
@@ -76,7 +77,7 @@ function TodoList() {
             if(isTokenExpired(token)){
                 navigate('/login');
             }
-            await axios.delete("http://127.0.0.1:5000/clearTodoList", {
+            await axios.delete(`${config.API_URL}/clearTodoList`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -94,7 +95,7 @@ function TodoList() {
             if(isTokenExpired(token)){
                 navigate('/login');
             }
-            await axios.put("http://127.0.0.1:5000/updateTodoItem", {
+            await axios.put(`${config.API_URL}/updateTodoItem`, {
                 item_id: item.id
             }, {
                 headers: {

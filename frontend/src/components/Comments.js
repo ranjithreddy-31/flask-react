@@ -1,9 +1,10 @@
-import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPencilAlt, faTrashAlt, faSave, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { getCurrentUser, isTokenExpired } from './Utils';
+import config from '../config';
 import "../css/Comment.css";
 
 function Comments({ comments, groupCode }) {
@@ -46,7 +47,7 @@ function Comments({ comments, groupCode }) {
         navigate('/login');
         return;
       }
-      await axios.put('http://127.0.0.1:5000/updateComment', {
+      await axios.put(`${config.API_URL}/updateComment`, {
         commentId: commentId,
         newComment: editedCommentText
       }, {
@@ -78,7 +79,7 @@ function Comments({ comments, groupCode }) {
         navigate('/login');
         return;
       }
-      await axios.delete('http://127.0.0.1:5000/deleteComment', {
+      await axios.delete(`${config.API_URL}/deleteComment`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

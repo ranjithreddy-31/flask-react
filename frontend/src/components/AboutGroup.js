@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { isTokenExpired } from './Utils'; 
 import '../css/AboutGroup.css';
+import Chat from './Chat';
+import config from '../config';
 
 function AboutGroup() {
   const { groupCode } = useParams();
@@ -18,7 +20,7 @@ function AboutGroup() {
         return;
       }
       
-      const response = await axios.get(`http://127.0.0.1:5000/about/${groupCode}`, {
+      const response = await axios.get(`${config.API_URL}/about/${groupCode}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -33,6 +35,10 @@ function AboutGroup() {
     fetchGroupData();
   }, [groupCode, fetchGroupData]);
 
+  const handleUserClick = (username) => {
+    navigate(`/profile/${username}`, { state: { groupCode } });
+  };
+
   if (error) {
     return <div className="error">{error}</div>;
   }
@@ -43,17 +49,34 @@ function AboutGroup() {
 
   return (
     <div className="about-group-container">
-      <div className="about-group">
-        <h1>{groupInfo.name}</h1>
-        <p>Group Code: {groupInfo.code}</p>
-        <p>Description: {groupInfo.description}</p>
-        <p>Created by: {groupInfo.created_by}</p>
-        <h2>Members:</h2>
-        <ul>
-          {groupInfo.members.map((member) => (
-            <li key={member.id}>{member.username}</li>
-          ))}
-        </ul>
+      <div className="about-group-content">
+        <div className="about-group">
+          <h1>{groupInfo.name}</h1>
+          <span className="group-meta">
+            Created by{' '}
+            <button onClick={() => handleUserClick(groupInfo.created_by)} className="user-link">
+              {groupInfo.created_by}
+            </button>{' '}
+            on {new Date(groupInfo.created_at).toLocaleDateString()}
+          </span>
+          <p><strong>Group Code:</strong> {groupInfo.code}</p>
+          <p><strong>Description:</strong> {groupInfo.description}</p>
+        </div>
+        <div className="group-members">
+          <h2>Members</h2>
+          <ul>
+            {groupInfo.members.map((member) => (
+              <li key={member.id}>
+                <button onClick={() => handleUserClick(member.username)} className="user-link">
+                  {member.username}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+      <div className="chat-section">
+        {!error && <Chat groupCode={groupCode} />}
       </div>
     </div>
   );

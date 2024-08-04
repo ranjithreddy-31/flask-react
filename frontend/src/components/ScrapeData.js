@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Layout from './Layout';
 import { isTokenExpired } from './Utils';
+import config from '../config';
 
 const ScrapeData = () => {
     const navigate = useNavigate();
@@ -16,7 +17,7 @@ const ScrapeData = () => {
             if(isTokenExpired(token)){
                 navigate('/login');
             }
-            const response = await axios.post("http://127.0.0.1:5000/getData", {
+            const response = await axios.post(`${config.API_URL}/getData`, {
                 url: url
             }, {
                 headers: {

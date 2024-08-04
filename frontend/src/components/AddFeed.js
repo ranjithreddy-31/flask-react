@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import { isTokenExpired } from './Utils';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import config from '../config'
 
 function AddFeed({onFeedAdded, groupCode}) {
     const navigate = useNavigate();
@@ -40,7 +41,7 @@ function AddFeed({onFeedAdded, groupCode}) {
                 photoBase64 = await convertToBase64(photo);
             }
 
-            await axios.post("http://127.0.0.1:5000/addFeed", {
+            await axios.post(`${config.API_URL}/addFeed`, {
                 heading: heading,
                 content: content,
                 photo: photoBase64,

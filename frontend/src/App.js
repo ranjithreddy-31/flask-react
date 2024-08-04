@@ -31,9 +31,7 @@ const App = () => {
         <Route path="/feedgroups" element={<PrivateRoute><FeedGroups /></PrivateRoute>} />
         <Route path="/feed" element={<PrivateRoute><FeedMainLayout /></PrivateRoute>}>
           <Route path=":groupCode" element={<Feed />} />
-        </Route>
-        <Route path="/about" element={<PrivateRoute><FeedMainLayout /></PrivateRoute>}>
-          <Route path=":groupCode" element={<AboutGroup/>} />
+          <Route path=":groupCode/about" element={<AboutGroup />} />
         </Route>
         <Route path="/chat" element={<PrivateRoute><Chat /></PrivateRoute>} />
       </Routes>
