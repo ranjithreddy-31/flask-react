@@ -16,10 +16,10 @@ nltk.download('punkt')
 from auth import auth_bp, create_anonymous_user
 from feed import feed_bp
 from comment import comment_bp
-from todo import todo_bp
-from scraper import scraper_bp
-from weather import weather_bp
-from calculator import calculator_bp
+# from todo import todo_bp
+# from scraper import scraper_bp
+# from weather import weather_bp
+# from calculator import calculator_bp
 from group import group_bp
 from chat import chat_bp
 
@@ -65,10 +65,10 @@ jwt = JWTManager(app)
 app.register_blueprint(auth_bp)
 app.register_blueprint(feed_bp)
 app.register_blueprint(comment_bp)
-app.register_blueprint(todo_bp)
-app.register_blueprint(scraper_bp)
-app.register_blueprint(weather_bp)
-app.register_blueprint(calculator_bp)
+# app.register_blueprint(todo_bp)
+# app.register_blueprint(scraper_bp)
+# app.register_blueprint(weather_bp)
+# app.register_blueprint(calculator_bp)
 app.register_blueprint(group_bp)
 app.register_blueprint(chat_bp)
 
