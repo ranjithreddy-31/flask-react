@@ -2,11 +2,12 @@
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from flask_jwt_extended import get_jwt_identity
 from models import db, ChatMessage, User, Group
+from constants import FRONTEND_SERVERS
 
 socketio = SocketIO()
 
 def init_socketio(app):
-    socketio.init_app(app, cors_allowed_origins=["http://localhost:3000", "http://127.0.0.1:3000"])
+    socketio.init_app(app, cors_allowed_origins=FRONTEND_SERVERS)
 
 @socketio.on('connect')
 def handle_connect():

@@ -3,6 +3,7 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt, get_j
 from flask_bcrypt import Bcrypt
 from models import User, db
 from blacklist import blacklist
+from constants import FRONTEND_SERVER
 
 auth_bp = Blueprint('auth', __name__)
 bcrypt = Bcrypt()
@@ -27,7 +28,7 @@ def login():
     if user and bcrypt.check_password_hash(user.password, data['password']):
         access_token = create_access_token(identity=user.id)
         response = jsonify(access_token=access_token)
-        response.headers.add("Access-Control-Allow-Origin", "http://localhost:3000")
+        response.headers.add("Access-Control-Allow-Origin", FRONTEND_SERVER)
         return response, 200
     else:
         return jsonify({'message': 'Invalid credentials'}), 401
