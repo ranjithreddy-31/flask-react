@@ -7,6 +7,7 @@ import config from '../config';
 import AddFeed from './AddFeed';
 import Chat from './Chat';
 import '../css/Feed.css'; // Assuming you have a CSS file for Feed component
+import ErrorComponent from './ErrorComponent';
 
 function Feed() {
     const navigate = useNavigate();
@@ -330,10 +331,13 @@ function Feed() {
           console.error('Error toggling like:', error);
         }
       };
-
+    const handleErrorClose = () =>{
+        setError(null);
+        navigate('/feed');
+    }
     return (
         <div className="feed-and-chat-container">
-            {error && <h1>{error}</h1>}
+            {error && <ErrorComponent message={error} onClose={handleErrorClose} />}
             <div className="feed-section">
                 <div className="feed-container">
                     {/* {error && <h1>{error}</h1>} */}

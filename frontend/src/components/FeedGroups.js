@@ -5,6 +5,7 @@ import axios from 'axios';
 import { getCurrentUser, isTokenExpired } from './Utils';
 import '../css/FeedGroups.css';
 import config from '../config';
+import ErrorComponent from './ErrorComponent'; // Import the ErrorComponent
 
 function FeedGroups() {
     const navigate = useNavigate();
@@ -22,7 +23,6 @@ function FeedGroups() {
     const [editGroupName, setEditGroupName] = useState('');
     const [refreshTrigger, setRefreshTrigger] = useState(0);
     const [activeGroup, setActiveGroup] = useState(initialGroupCode);
-    // const [hoveredGroup, setHoveredGroup] = useState(null);
     const socketRef = useRef();
     const menuRef = useRef();
 
@@ -39,7 +39,7 @@ function FeedGroups() {
             });
             setUserGroups(response.data.groups);
         } catch (error) {
-            console.error(`Failed fetching user groups with error:`, error);
+            console.error('Failed fetching user groups:', error);
             setError('Failed to fetch user groups. Please try again.');
         }
     }, [navigate]);
@@ -67,8 +67,8 @@ function FeedGroups() {
             setUserGroups((prevGroups) => prevGroups.map(group => 
                 group.code === updatedGroup.code ? updatedGroup : group
             ));
-            
         });
+
         return () => {
             console.log('Disconnecting Socket in FeedGroups');
             socketRef.current.emit('leave', { groupCode });
@@ -117,7 +117,7 @@ function FeedGroups() {
             fetchUserGroups();
             setActiveForm(null); // Close the form after successful creation
         } catch (error) {
-            console.error(`Failed creating group with error:`, error);
+            console.error('Failed creating group:', error);
             setError('Failed to create group. Please try again.');
         }
     };
@@ -147,7 +147,7 @@ function FeedGroups() {
                 navigate(`/feed/${groupCode}`);
             }
         } catch (error) {
-            console.error(`Error joining group:`, error);
+            console.error('Error joining group:', error);
             setError(error.response?.data?.message || 'Failed to join group. Please try again.');
         }
     };
@@ -287,7 +287,12 @@ function FeedGroups() {
                 </form>
             )}
 
-            {error && <p className="feed-groups-error">{error}</p>}
+            {error && (
+                <ErrorComponent
+                    message={error}
+                    onClose={() => setError('')}
+                />
+            )}
             
             {newGroupCode && (
                 <p className="feed-groups-message">New group created! Group code: {newGroupCode}</p>
@@ -331,8 +336,6 @@ function FeedGroups() {
                                     onClick={() => {
                                         setActiveGroup(group.code);
                                     }}
-                                    // onMouseEnter={() => setHoveredGroup(group.code)}
-                                    // onMouseLeave={() => setHoveredGroup(null)}
                                     key={group.code}
                               >
                                     
@@ -343,11 +346,6 @@ function FeedGroups() {
                                     </div>
                                 </Link>
                             )}
-                            {/* { hoveredGroup === group.code && (
-                                    <div className="group-description-popup">
-                                        <p>{group.description}</p>
-                                    </div>
-                            )} */}
                             <div className="group-menu" ref={menuRef}>
                                 <button onClick={(event) => toggleMenu(event, group.code)} className={`menu-toggle ${activeGroup === group.code ? 'active' : ''}`}>
                                     ⋮
