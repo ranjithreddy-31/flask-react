@@ -14,6 +14,10 @@ function Comments({ comments, groupCode }) {
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editedCommentText, setEditedCommentText] = useState('');
 
+  const [darkMode] = useState(() => {
+    return localStorage.getItem('darkMode') === 'true';
+  });
+
   const fetchCurrentUser = useCallback(async () => {
     try {
       const user = await getCurrentUser();
@@ -95,7 +99,7 @@ function Comments({ comments, groupCode }) {
   }
 
   return (
-    <div className="comments-container">
+    <div className={`comments-container ${darkMode ? 'dark-mode' : ''}`}>
       <div className="comments-list">
         {localComments && localComments.length > 0 ? (
           localComments.map(comment => (

@@ -1,3 +1,17 @@
+:root {
+    --background-color: #f0f0f0;
+    --border-color: #ccc;
+    --divider-color: #ddd;
+    --divider-hover-color: #bbb;
+}
+
+.dark-mode {
+    --background-color: #18191a;
+    --border-color: #3a3b3c;
+    --divider-color: #4a4e54;
+    --divider-hover-color: #5a5e64;
+}
+
 .main-layout {
     display: flex;
     height: 100vh;
@@ -8,8 +22,8 @@
 }
 
 .left-pane {
-    background-color: #f0f0f0;
-    border-right: 1px solid #ccc;
+    background-color: var(--background-color);
+    border-right: 1px solid var(--border-color);
 }
 
 .right-pane {
@@ -20,11 +34,11 @@
 .divider {
     width: 5px;
     cursor: col-resize;
-    background-color: #ddd;
+    background-color: var(--divider-color);
 }
 
 .divider:hover {
-    background-color: #bbb;
+    background-color: var(--divider-hover-color);
 }
 
 .feed-and-chat-container {
@@ -34,7 +48,7 @@
 
 .feed-section {
     flex: 1;
-    border-right: 1px solid #ccc;
+    border-right: 1px solid var(--border-color);
 }
 
 .chat-section {

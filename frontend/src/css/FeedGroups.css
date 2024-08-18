@@ -1,13 +1,43 @@
+:root {
+    --primary-color: #1877f2;
+    --secondary-color: #66cdaa;
+    --text-color-primary: #1c1e21;
+    --text-color-secondary: #65676b;
+    --border-color: #dddfe2;
+    --background-color: #f0f2f5;
+    --container-color: #ffffff;
+    --hover-color: #f2f3f5;
+    --box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    --active-background-color: #166fe5;
+    --error-color: #dc3545;
+    --message-color: #1877f2;
+}
+
+.dark-mode {
+    --primary-color: #4d5257;
+    --secondary-color: #66cdaa;
+    --text-color-primary: #e4e6eb;
+    --text-color-secondary: #b0b3b8;
+    --border-color: #3a3b3c;
+    --background-color: #18191a;
+    --container-color: #242526;
+    --hover-color: #3a3b3c;
+    --box-shadow: 0 1px 2px rgba(255, 255, 255, 0.1);
+    --active-background-color: #4a4e54;
+    --error-color: #ff6b6b;
+    --message-color: #80bfff;
+}
+
 .feed-groups-container {
-    background-color: #f0f2f5;
+    background-color: var(--background-color);
     border-radius: 8px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--box-shadow);
     padding: 20px;
     margin-bottom: 20px;
 }
 
 .feed-groups-title {
-    color: #1877f2;
+    color: var(--primary-color);
     font-size: 1.8rem;
     margin-bottom: 1.5rem;
     text-align: center;
@@ -21,7 +51,7 @@
 
 .feed-groups-button {
     padding: 10px 15px;
-    background-color: #1877f2;
+    background-color: var(--primary-color);
     color: #fff;
     border: none;
     border-radius: 6px;
@@ -34,7 +64,7 @@
 }
 
 .feed-groups-button:hover {
-    background-color: #166fe5;
+    background-color: var(--active-background-color);
 }
 
 .feed-groups-form {
@@ -46,18 +76,18 @@
 
 .feed-groups-input,
 .feed-groups-textarea {
-    border: 1px solid #dddfe2;
+    border: 1px solid var(--border-color);
     font-size: 16px;
     padding: 12px;
     resize: none;
-    background-color: #ffffff;
+    background-color: var(--container-color);
     border-radius: 6px;
 }
 
 .feed-groups-input:focus,
 .feed-groups-textarea:focus {
     outline: none;
-    border-color: #1877f2;
+    border-color: var(--primary-color);
     box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.2);
 }
 
@@ -67,7 +97,7 @@
 
 .feed-groups-submit {
     padding: 10px 15px;
-    background-color: #1877f2;
+    background-color: var(--primary-color);
     color: #fff;
     border: none;
     border-radius: 6px;
@@ -78,17 +108,17 @@
 }
 
 .feed-groups-submit:hover {
-    background-color: #166fe5;
+    background-color: var(--active-background-color);
 }
 
 .feed-groups-error {
-    color: #dc3545;
+    color: var(--error-color);
     font-size: 14px;
     margin-top: 10px;
 }
 
 .feed-groups-message {
-    color: #1877f2;
+    color: var(--message-color);
     font-size: 14px;
     margin-top: 10px;
 }
@@ -102,13 +132,13 @@
     align-items: center;
     justify-content: space-between;
     padding: 15px;
-    background-color: #ffffff;
+    background-color: var(--container-color);
     border-radius: 8px;
     margin-bottom: 15px;
     text-decoration: none;
-    color: #1c1e21;
+    color: var(--text-color-primary);
     transition: background-color 0.3s;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--box-shadow);
     position: relative;
 }
 
@@ -126,15 +156,14 @@
 }
 
 .feed-group-item.active {
-    background-color: #1877f2; /* or any color you prefer */
+    background-color: var(--active-background-color);
     font-weight: bold;
-    /* Add any other styles to highlight the active group */
-  }
+}
 
 .feed-group-avatar {
     width: 50px;
     height: 50px;
-    background-color: #1877f2;
+    background-color: var(--primary-color);
     color: #ffffff;
     border-radius: 50%;
     display: flex;
@@ -146,43 +175,39 @@
 }
 
 .feed-group-avatar.active {
-    background-color: #f0f2f5;
-    color: #000000;
+    background-color: var(--background-color);
+    color: var(--text-color-primary);
 }
 
 .feed-group-info h3 {
     margin: 0;
     font-size: 18px;
-    color: #1c1e21;
+    color: var(--text-color-primary);
 }
 
 .feed-group-info p {
     margin: 4px 0 0;
     font-size: 14px;
-    color: #65676b;
+    color: var(--text-color-secondary);
 }
 
 .feed-group-info.active h3 {
-    margin: 0;
-    font-size: 18px;
     color: #ffffff;
 }
 
 .feed-group-info.active p {
-    margin: 4px 0 0;
-    font-size: 14px;
     color: #ffffff;
 }
 
 .feed-groups-empty {
     text-align: center;
-    color: #65676b;
+    color: var(--text-color-secondary);
     font-size: 16px;
     margin-top: 30px;
 }
 
 .feed-groups-button.active {
-    background-color: #166fe5;
+    background-color: var(--active-background-color);
 }
 
 .group-menu {
@@ -193,7 +218,7 @@
     background: none;
     border: none;
     font-size: 20px;
-    color: #65676b;
+    color: var(--text-color-secondary);
     cursor: pointer;
     padding: 5px 10px;
 }
@@ -206,10 +231,10 @@
     position: absolute;
     right: 0;
     top: 100%;
-    background-color: white;
-    border: 1px solid #dddfe2;
+    background-color: var(--container-color);
+    border: 1px solid var(--border-color);
     border-radius: 6px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: var(--box-shadow);
     z-index: 10;
     min-width: 120px;
 }
@@ -223,12 +248,12 @@
     border: none;
     cursor: pointer;
     font-size: 14px;
-    color: #1c1e21;
+    color: var(--text-color-primary);
     transition: background-color 0.2s;
 }
 
 .menu-dropdown button:hover {
-    background-color: #f2f3f5;
+    background-color: var(--hover-color);
 }
 
 .menu-dropdown button:disabled {
@@ -241,12 +266,12 @@
     flex-direction: column;
     gap: 10px;
     padding: 10px;
-    background-color: #f0f2f5;
+    background-color: var(--background-color);
     border-radius: 6px;
 }
 
 .edit-heading-input {
-    border: 1px solid #dddfe2;
+    border: 1px solid var(--border-color);
     font-size: 16px;
     padding: 10px;
     border-radius: 6px;
@@ -269,21 +294,21 @@
 }
 
 .post-button {
-    background-color: #1877f2;
+    background-color: var(--primary-color);
     color: #fff;
 }
 
 .post-button:hover {
-    background-color: #166fe5;
+    background-color: var(--active-background-color);
 }
 
 .cancel-button {
-    background-color: #e4e6eb;
-    color: #1c1e21;
+    background-color: var(--secondary-button-color);
+    color: var(--text-color-primary);
 }
 
 .cancel-button:hover {
-    background-color: #d8dadf;
+    background-color: var(--hover-color);
 }
 
 .group-description-popup {
@@ -291,15 +316,15 @@
     top: calc(100% + 10px);
     left: 50%;
     transform: translateX(-50%);
-    background-color: #f0f2f5;
-    border: 1px solid #dddfe2;
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 12px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--box-shadow);
     z-index: 10;
     width: 250px;
     font-size: 14px;
-    color: #1c1e21;
+    color: var(--text-color-primary);
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s, visibility 0.3s;
@@ -315,8 +340,8 @@
     transform: translateX(-50%);
     width: 14px;
     height: 14px;
-    background-color: #f0f2f5;
-    border-left: 1px solid #dddfe2;
-    border-top: 1px solid #dddfe2;
+    background-color: var(--background-color);
+    border-left: 1px solid var(--border-color);
+    border-top: 1px solid var(--border-color);
     transform: rotate(45deg);
 }

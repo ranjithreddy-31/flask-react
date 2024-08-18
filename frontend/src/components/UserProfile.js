@@ -27,6 +27,10 @@ function UserProfile() {
     const [posts, setPosts] = useState([]);
     const socketRef = useRef();
 
+    const [darkMode] = useState(() => {
+        return localStorage.getItem('darkMode') === 'true';
+      });
+
     useEffect(()=>{
         socketRef.current = io(`${config.API_URL}`);
 
@@ -266,7 +270,7 @@ function UserProfile() {
 
     return (
         <Layout>
-            <div className="feed-container">
+            <div className={`feed-container ${darkMode ? 'dark-mode' : ''}`}>
                 <div className="profile-header">
                     <h1>{username}'s Profile</h1>
                     <p>User ID: {user.id}</p>

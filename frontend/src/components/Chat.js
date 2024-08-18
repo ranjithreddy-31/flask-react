@@ -15,6 +15,10 @@ function Chat({ groupCode }) {
     const socketRef = useRef();
     const chatContainerRef = useRef();
 
+    const [darkMode] = useState(() => {
+        return localStorage.getItem('darkMode') === 'true';
+      });
+
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (isTokenExpired(token)) {
@@ -99,7 +103,7 @@ function Chat({ groupCode }) {
     }
 
     return (
-        <div className="chat-container">
+        <div className={`chat-container ${darkMode ? 'dark-mode' : ''}`}>
             <div className="chat-header">
                 <h2>Group Chat</h2>
             </div>

@@ -11,6 +11,10 @@ function FeedMainLayout() {
     const leftPaneRef = useRef(null);
     const navigate = useNavigate();
 
+    const [darkMode] = useState(() => {
+        return localStorage.getItem('darkMode') === 'true';
+      });
+
     useEffect(()=>{
         const token = localStorage.getItem('token');
         if (isTokenExpired(token)) {
@@ -40,7 +44,7 @@ function FeedMainLayout() {
 
     return (
         <Layout>
-            <div className="main-layout">
+            <div className={`main-layout ${darkMode ? 'dark-mode' : ''}`}>
                 <div 
                     className="pane left-pane" 
                     ref={leftPaneRef}

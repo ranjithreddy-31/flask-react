@@ -14,6 +14,10 @@ function AddFeed({onFeedAdded, groupCode}) {
     const fileInputRef = useRef(null);
     const formRef = useRef(null);
 
+    const [darkMode] = useState(() => {
+        return localStorage.getItem('darkMode') === 'true';
+      });
+
     useEffect(() => {
         function handleClickOutside(event) {
             if (formRef.current && !formRef.current.contains(event.target)) {
@@ -100,7 +104,7 @@ function AddFeed({onFeedAdded, groupCode}) {
     }
 
     return (
-        <div className="add-feed-container" ref={formRef}>
+        <div className={`add-feed-container ${darkMode ? 'dark-mode' : ''}`} ref={formRef}>
             <form onSubmit={addFeed} className="add-feed-form">
                 {!isExpanded ? (
                     <div className="add-feed-prompt" onClick={handleExpand}>

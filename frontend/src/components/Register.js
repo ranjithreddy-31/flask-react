@@ -13,6 +13,10 @@ const Register = () => {
     const [message, setMessage] = useState('Please enter your details');
     const navigate = useNavigate();
 
+    const [darkMode] = useState(() => {
+        return localStorage.getItem('darkMode') === 'true';
+      });
+
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
@@ -32,7 +36,7 @@ const Register = () => {
     };
 
     return (
-        <div className="register-container">
+        <div className={`register-container ${darkMode ? 'dark-mode' : ''}`}>
             <h1 className="app-title">Welcome to MyAPP!!</h1>
             <div className="register-box">
                 <h2 className="register-title">Register</h2>

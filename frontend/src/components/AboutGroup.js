@@ -10,6 +10,9 @@ function AboutGroup() {
   const { groupCode } = useParams();
   const [groupInfo, setGroupInfo] = useState(null);
   const [error, setError] = useState('');
+  const [darkMode] = useState(() => {
+    return localStorage.getItem('darkMode') === 'true';
+  });
   const navigate = useNavigate();
 
   const fetchGroupData = useCallback(async () => {
@@ -48,7 +51,7 @@ function AboutGroup() {
   }
 
   return (
-    <div className="about-group-container">
+    <div className={`about-group-container ${darkMode ? 'dark-mode' : ''}`}>
       <div className="about-group-content">
         <div className="about-group">
           <h1>{groupInfo.name}</h1>

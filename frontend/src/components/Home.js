@@ -6,6 +6,9 @@ import Layout from './Layout';
 const Home = () => {
     const navigate = useNavigate();
     const [currentPage, setCurrentPage] = useState('home');
+    const [darkMode] = useState(() => {
+        return localStorage.getItem('darkMode') === 'true';
+      });
 
     useEffect(() => {
         if (currentPage !== 'home') {
@@ -19,10 +22,10 @@ const Home = () => {
 
     return (
         <Layout>
-            <div className="home-container">
-            <div className="home-content">
-                <h1 className="home-title">Welcome</h1>
-                <p className="home-welcome">Where every chat sparks a connection and every feed tells a story.</p>
+            <div className={`home-container ${darkMode ? 'dark-mode' : ''}`}>
+                <div className="home-content">
+                    <h1 className="home-title">Welcome</h1>
+                    <p className="home-welcome">Where every chat sparks a connection and every feed tells a story.</p>
                 </div>    
                 <div className="button-container">
                     {/* <button className="home-button" onClick={() => handleNavigation('scrape_data')}>Web Scraping</button>

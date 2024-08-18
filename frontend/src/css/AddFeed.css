@@ -1,23 +1,53 @@
+:root {
+    --background-color: #f0f2f5; /* Light grey background */
+    --container-background-color: #ffffff; /* White background for containers */
+    --text-color: #050505;
+    --secondary-text-color: #65676b;
+    --border-color: #dddfe2;
+    --hover-background-color: #f2f3f5;
+    --box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    --primary-button-color: #1877f2;
+    --primary-button-hover-color: #166fe5;
+    --secondary-button-color: #e4e6eb;
+    --secondary-button-hover-color: #d8dadf;
+    --message-color: #1877f2;
+}
+
+.dark-mode {
+    --background-color: #18191a;
+    --container-background-color: #242526;
+    --text-color: #e4e6eb;
+    --secondary-text-color: #b0b3b8;
+    --border-color: #3a3b3c;
+    --hover-background-color: #3a3b3c;
+    --box-shadow: 0 1px 2px rgba(255, 255, 255, 0.1);
+    --primary-button-color: #80bfff;
+    --primary-button-hover-color: #66a3ff;
+    --secondary-button-color: #3a3b3c;
+    --secondary-button-hover-color: #484a4d;
+    --message-color: #80bfff;
+}
+
 .add-feed-container {
-    background-color: #f0f2f5; /* Light grey background */
+    background-color: var(--background-color);
     border-radius: 8px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--box-shadow);
     padding: 12px;
     margin-bottom: 20px;
 }
 
 .add-feed-prompt {
-    color: #65676b;
+    color: var(--secondary-text-color);
     font-size: 17px;
     padding: 12px;
     border-radius: 20px;
-    background-color: #ffffff; /* White background for the prompt */
+    background-color: var(--container-background-color);
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
 
 .add-feed-prompt:hover {
-    background-color: #f2f3f5;
+    background-color: var(--hover-background-color);
 }
 
 .add-feed-form {
@@ -31,8 +61,9 @@
     padding: 12px;
     margin-bottom: 10px;
     resize: none;
-    background-color: #ffffff;
+    background-color: var(--container-background-color);
     border-radius: 6px;
+    color: var(--text-color);
 }
 
 .feed-input:focus {
@@ -52,7 +83,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-top: 1px solid #e4e6eb;
+    border-top: 1px solid var(--border-color);
     padding-top: 10px;
     margin-top: 10px;
 }
@@ -68,12 +99,12 @@
 }
 
 .photo-button {
-    background-color: #e4e6eb;
-    color: #050505;
+    background-color: var(--secondary-button-color);
+    color: var(--text-color);
 }
 
 .photo-button:hover {
-    background-color: #d8dadf;
+    background-color: var(--secondary-button-hover-color);
 }
 
 .buttons-group {
@@ -82,26 +113,26 @@
 }
 
 .post-button {
-    background-color: #1877f2;
+    background-color: var(--primary-button-color);
     color: #fff;
 }
 
 .post-button:hover {
-    background-color: #166fe5;
+    background-color: var(--primary-button-hover-color);
 }
 
 .cancel-button {
-    background-color: #e4e6eb;
-    color: #050505;
+    background-color: var(--secondary-button-color);
+    color: var(--text-color);
 }
 
 .cancel-button:hover {
-    background-color: #d8dadf;
+    background-color: var(--secondary-button-hover-color);
 }
 
 .photo-preview {
     font-size: 14px;
-    color: #65676b;
+    color: var(--secondary-text-color);
     margin-bottom: 10px;
     justify-content: center;
 }
@@ -109,13 +140,13 @@
 .message {
     margin-top: 10px;
     font-size: 14px;
-    color: #1877f2;
+    color: var(--message-color);
 }
 
 .edit-post-container {
-    background-color: #f0f2f5;
+    background-color: var(--background-color);
     border-radius: 8px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--box-shadow);
     padding: 12px;
     margin-bottom: 20px;
 }
@@ -132,8 +163,9 @@
     padding: 12px;
     margin-bottom: 10px;
     resize: none;
-    background-color: #ffffff;
+    background-color: var(--container-background-color);
     border-radius: 6px;
+    color: var(--text-color);
 }
 
 .edit-heading-input:focus,
@@ -181,35 +213,35 @@
 }
 
 .update-button {
-    background-color: #1877f2;
+    background-color: var(--primary-button-color);
     color: #fff;
 }
 
 .update-button:hover {
-    background-color: #166fe5;
+    background-color: var(--primary-button-hover-color);
 }
 
 .cancel-button {
-    background-color: #e4e6eb;
-    color: #050505;
+    background-color: var(--secondary-button-color);
+    color: var(--text-color);
 }
 
 .cancel-button:hover {
-    background-color: #d8dadf;
+    background-color: var(--secondary-button-hover-color);
 }
 
 .edit-photo-label {
     display: inline-block;
     padding: 8px 12px;
-    background-color: #e4e6eb;
-    color: #050505;
+    background-color: var(--secondary-button-color);
+    color: var(--text-color);
     border-radius: 6px;
     cursor: pointer;
     transition: background-color 0.3s;
 }
 
 .edit-photo-label:hover {
-    background-color: #d8dadf;
+    background-color: var(--secondary-button-hover-color);
 }
 
 .edit-photo-input {
@@ -222,6 +254,6 @@
 
 .edit-photo-preview-text {
     font-size: 14px;
-    color: #65676b;
+    color: var(--secondary-text-color);
     margin-bottom: 5px;
 }

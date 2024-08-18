@@ -13,6 +13,10 @@ const Login = () => {
     const [loginSuccessful, setLoginSuccessful] = useState(false);
     const navigate = useNavigate();
 
+    const [darkMode] = useState(() => {
+        return localStorage.getItem('darkMode') === 'true';
+      });
+
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
@@ -35,7 +39,7 @@ const Login = () => {
     };
 
     return (
-        <div className="login-container">
+        <div className={`login-container ${darkMode ? 'dark-mode' : ''}`}>
             <h1 className="app-title">Welcome to MyAPP!!</h1>
             <div className="login-box">
                 <h2 className="login-title">Login</h2>

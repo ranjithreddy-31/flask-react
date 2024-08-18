@@ -26,6 +26,10 @@ function FeedGroups() {
     const socketRef = useRef();
     const menuRef = useRef();
 
+    const [darkMode] = useState(() => {
+        return localStorage.getItem('darkMode') === 'true';
+      });
+
     const fetchUserGroups = useCallback(async () => {
         setError('');
         try {
@@ -238,7 +242,7 @@ function FeedGroups() {
     };
 
     return (
-        <div className="feed-groups-container">
+        <div className={`feed-groups-container ${darkMode ? 'dark-mode' : ''}`}>
             <h2 className="feed-groups-title">Your Groups</h2>
             <div className="feed-groups-actions">
                 <button 

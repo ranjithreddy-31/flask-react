@@ -28,8 +28,8 @@ def send_group_message(groupCode):
         group = Group.query.filter_by(code=groupCode).first()
         if not group:
             return jsonify({'error': 'Group not found'}), 404
-        if message_content.startswith('@anonymous'):
-            message_content = message_content.lstrip('@anonymous')
+        if message_content.startswith('#anonymous'):
+            message_content = message_content.lstrip('#anonymous')
             user = User.query.filter_by(username='anonymous').first()
         else:
             current_user_id = get_jwt_identity()
