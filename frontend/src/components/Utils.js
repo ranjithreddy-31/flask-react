@@ -3,6 +3,7 @@ import axios from 'axios';
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperPlane, faHeart, faComment } from '@fortawesome/free-solid-svg-icons';
+import DOMPurify from 'dompurify';
 import config from '../config';
 import Comments from './Comments';
 import '../css/Feed.css';
@@ -114,6 +115,9 @@ export const showFeeds = (
             [postId]: !prevState[postId]
         }));
     };
+    const createMarkup = (html) => {
+        return { __html: DOMPurify.sanitize(html) };
+    };
     return (
         <div className="posts-section">
             {posts.map(post => (
@@ -203,7 +207,11 @@ export const showFeeds = (
                         </div>
                     ) : (
                         <>
-                            <p className="post-content">{post.content}</p>
+                            
+                            <p 
+                                className="post-content"
+                                dangerouslySetInnerHTML={createMarkup(post.content)}
+                            />
                             {post.picture && isAuthorized && (
                                 <div className="post-image-container">
                                     <img 

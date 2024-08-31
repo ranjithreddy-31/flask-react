@@ -3,6 +3,9 @@ import { isTokenExpired } from './Utils';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import config from '../config'
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css'; // Import Quill styles
+import DOMPurify from 'dompurify';
 
 function AddFeed({onFeedAdded, groupCode}) {
     const navigate = useNavigate();
@@ -16,7 +19,25 @@ function AddFeed({onFeedAdded, groupCode}) {
 
     const [darkMode] = useState(() => {
         return localStorage.getItem('darkMode') === 'true';
-      });
+    });
+
+    // Quill modules configuration
+    const modules = {
+        toolbar: [
+            ['bold', 'italic', 'underline', 'strike'],
+            ['blockquote', 'code-block'],
+            [{ 'header': 1 }, { 'header': 2 }],
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+            [{ 'script': 'sub'}, { 'script': 'super' }],
+            [{ 'indent': '-1'}, { 'indent': '+1' }],
+            [{ 'direction': 'rtl' }],
+            ['link', 'image'],
+            [{ 'color': [] }, { 'background': [] }],
+            [{ 'font': [] }],
+            [{ 'align': [] }],
+            ['clean']
+        ],
+    };
 
     useEffect(() => {
         function handleClickOutside(event) {
@@ -45,9 +66,12 @@ function AddFeed({onFeedAdded, groupCode}) {
                 photoBase64 = await convertToBase64(photo);
             }
 
+            // Sanitize the content before sending to the server
+            const sanitizedContent = DOMPurify.sanitize(content);
+
             await axios.post(`${config.API_URL}/addFeed`, {
                 heading: heading,
-                content: content,
+                content: sanitizedContent,
                 photo: photoBase64,
                 groupCode: groupCode
             }, {
@@ -119,12 +143,14 @@ function AddFeed({onFeedAdded, groupCode}) {
                             value={heading}
                             className="feed-input heading-input"
                         />
-                        <textarea 
-                            placeholder="What's on your mind?"
-                            onChange={(e) => setContent(e.target.value)} 
+                        <ReactQuill 
+                            theme="snow"
                             value={content}
+                            onChange={setContent}
+                            modules={modules}
+                            placeholder="What's on your mind?"
                             className="feed-input content-input"
-                        ></textarea>
+                        />
                         {photo && <div className="photo-preview">Photo selected: {photo.name}</div>}
                         <div className="feed-actions">
                             <button type="button" onClick={triggerFileInput} className="action-button photo-button">
