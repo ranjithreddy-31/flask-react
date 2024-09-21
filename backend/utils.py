@@ -5,6 +5,12 @@ from botocore.exceptions import NoCredentialsError
 from PIL import Image
 import io
 from flask import send_file
+import google.generativeai as genai
+from constants import GOOGLE_API_KEY
+
+genai.configure(api_key=GOOGLE_API_KEY)
+
+model = genai.GenerativeModel('gemini-pro')
 
 def generate_random_code(length=6):
     return ''.join(random.choices(string.ascii_uppercase, k=length))
@@ -49,4 +55,8 @@ def delete_file_from_s3(s3, bucket_name, object_name):
         print(f"An unexpected error occurred: {e}")
         return None
 
+def parphrase(text):
+    question = f"I am posting a photo on a social media platform. This is my caption: '{text}'. Fix grammatical and sytactical errors and beautify it"
+    response = model.generate_content("Write me a poem about Machine Learning.")
 
+    return response.text
