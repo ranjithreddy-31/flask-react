@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 import base64
 from socketio_module import socketio
 from constants import AWS_ACCESS_KEY, AWS_SECRET_KEY, AWS_BUCKET, AWS_FILE_FOLDER, AWS_REGION
-from utils import get_s3_client, upload_file_to_s3, get_file_from_s3, delete_file_from_s3
+from utils import get_s3_client, upload_file_to_s3, get_file_from_s3, delete_file_from_s3, beautifyContent
 
 feed_bp = Blueprint('feed', __name__)
 s3_client = get_s3_client(AWS_ACCESS_KEY, AWS_SECRET_KEY, AWS_REGION)
@@ -181,7 +181,6 @@ def update_feed(feedId):
 
 @feed_bp.route('/uploads/<filename>', methods=["GET"])
 def uploaded_file(filename):
-    print(f'Getting file from s3')
     try:
         s3_file_name = f"feed_photos/{filename}"
         image_data =  get_file_from_s3(s3_client, AWS_BUCKET, s3_file_name)
@@ -247,6 +246,17 @@ def toggle_like():
     like_count = Like.query.filter_by(feed_id=feed_id).count()
     emit_like(feed_id, like_count, group_code)
     return jsonify({'success': True, 'likeCount': like_count})
+
+@feed_bp.route("/getBeautifiedContent", methods = ["GET"])
+@jwt_required()
+def getBeautifiedContent():
+    content = request.args.get('content')
+    print(content)
+    try:
+        beautifiedContent = beautifyContent(content)
+        return jsonify({'mesaage': 'successfully beautified the content', 'content': beautifiedContent}), 200
+    except:
+        return jsonify({'message': f'Failed to fetch beautified content: {e}'}), 500
 
 def jsonify_feeds(pagination):
     all_feeds_list = []

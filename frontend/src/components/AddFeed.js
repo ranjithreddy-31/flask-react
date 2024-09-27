@@ -126,6 +126,24 @@ function AddFeed({onFeedAdded, groupCode}) {
             fileInputRef.current.click();
         }
     }
+    const beautifyText = async() =>{
+        const token = localStorage.getItem('token');
+            if(isTokenExpired(token)){
+                navigate('/login');
+                return;
+            }
+        const response = await axios.get(`${config.API_URL}/getBeautifiedContent`, {
+            params: {
+                content: content
+            },
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        console.log(response);
+        setContent(response.data.content);
+    }
 
     return (
         <div className={`add-feed-container ${darkMode ? 'dark-mode' : ''}`} ref={formRef}>
@@ -155,6 +173,9 @@ function AddFeed({onFeedAdded, groupCode}) {
                         <div className="feed-actions">
                             <button type="button" onClick={triggerFileInput} className="action-button photo-button">
                                 📷 Photo
+                            </button>
+                            <button type="button" onClick={beautifyText} className="action-button beautify-button">
+                                🪄
                             </button>
                             <div className="buttons-group">
                                 <button type="button" onClick={handleCancel} className="action-button cancel-button">Cancel</button>

@@ -55,8 +55,7 @@ def delete_file_from_s3(s3, bucket_name, object_name):
         print(f"An unexpected error occurred: {e}")
         return None
 
-def parphrase(text):
-    question = f"I am posting a photo on a social media platform. This is my caption: '{text}'. Fix grammatical and sytactical errors and beautify it"
-    response = model.generate_content("Write me a poem about Machine Learning.")
-
+def beautifyContent(text):
+    question = f"I am posting a photo on a social media platform. This is my caption: '{text}'. Fix grammatical and sytactical errors and beautify it and return within 300 characters. Also add couple of hashtags"
+    response = model.generate_content(question)
     return response.text

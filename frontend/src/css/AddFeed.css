@@ -257,3 +257,54 @@
     color: var(--secondary-text-color);
     margin-bottom: 5px;
 }
+
+.beautify-button {
+    /* background-color: var(--primary-button-color); */
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px; /* Increase padding for larger size */
+    font-size: 24px; /* Increase font size for larger symbol */
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.beautify-button:hover {
+    background-color: var(--primary-button-hover-color);
+    transform: scale(1.2); /* Enlarge on hover */
+}
+
+/* Update the feed-actions to accommodate the new button */
+.feed-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--border-color);
+    padding-top: 10px;
+    margin-top: 10px;
+    flex-wrap: wrap; /* Allow wrapping for smaller screens */
+}
+
+/* Adjust the buttons-group to maintain its position */
+.buttons-group {
+    display: flex;
+    gap: 10px;
+    margin-left: auto; /* This will push the group to the right */
+}
+
+/* For smaller screens, give some vertical space between buttons */
+@media (max-width: 600px) {
+    .feed-actions {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .action-button {
+        margin-bottom: 10px;
+    }
+
+    .buttons-group {
+        margin-left: 0;
+        align-self: flex-end;
+    }
+}
