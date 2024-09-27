@@ -128,7 +128,12 @@ def delete_feed():
         db.session.delete(feed)
         db.session.commit()
 
-        # Emit the feed deletion to all clients in the group
+        filename = f"feed_photo_{feed.id}.jpg"
+        s3_file_name = f"feed_photos/{filename}"
+        response = delete_file_from_s3(s3_client, AWS_BUCKET, s3_file_name)
+        if not response:
+            print('Failed to delete file')
+
         emit_delete_feed(FeedId, group_code)
 
         return jsonify({"message": "Feed deleted successfully"}), 200
@@ -295,5 +300,3 @@ def serialize_comment(comment):
         'added_by': comment.author.username,
         'added_at': comment.added_at.isoformat()
     }
-
-    
